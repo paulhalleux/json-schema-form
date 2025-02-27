@@ -1,11 +1,11 @@
-import { JSONSchema } from "@phalleux/jsf-core";
+import { FormJsonSchema } from "@phalleux/jsf-core";
 
 import { Collapsible } from "./Collapsible.tsx";
 import { ExampleListItem } from "./ExampleListItem.tsx";
 
 export type ExampleListCategory = {
   categoryName: string;
-  schemas: (JSONSchema | ExampleListCategory)[];
+  schemas: (FormJsonSchema | ExampleListCategory)[];
 };
 
 type ExampleCategoryProps = {

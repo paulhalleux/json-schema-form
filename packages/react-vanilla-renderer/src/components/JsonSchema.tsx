@@ -1,5 +1,5 @@
 import React from "react";
-import { JSONSchema } from "@phalleux/jsf-core";
+import { FormJsonSchema } from "@phalleux/jsf-core";
 import { EyeIcon } from "lucide-react";
 
 import { Field } from "./fields";
@@ -7,11 +7,11 @@ import { TooltipWrapper } from "./shared";
 
 export type BaseFieldProps = {
   path: string;
-  schema: Exclude<JSONSchema, boolean>;
+  schema: Exclude<FormJsonSchema, boolean>;
 };
 
 type FieldMatcher = {
-  match: (schema: JSONSchema) => boolean;
+  match: (schema: FormJsonSchema) => boolean;
   component: React.ComponentType<BaseFieldProps>;
 };
 

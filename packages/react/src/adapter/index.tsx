@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  BaseRendererProps,
   createForm,
   type Form,
   FormState,
@@ -11,11 +12,10 @@ import { create, UseBoundStore } from "zustand/react";
 import { useShallow } from "zustand/react/shallow";
 import { StoreApi } from "zustand/vanilla";
 
-import { JsonSchema } from "./components";
-
 declare module "@phalleux/jsf-core" {
   export interface Register {
     store: UseBoundStore<StoreApi<FormState>>;
+    rendererType: React.ComponentType<BaseRendererProps>;
   }
 }
 
@@ -58,6 +58,17 @@ export type FormProps = {
   form: Form;
 } & React.ComponentProps<"form">;
 
+export const RenderSchema = ({ schema, path }: BaseRendererProps) => {
+  const instance = useFormInstance();
+  const Renderer = useMemo(() => {
+    return instance.getRenderer(schema);
+  }, [instance, schema]);
+
+  if (!Renderer) return "No renderer found";
+
+  return <Renderer schema={schema} path={path} />;
+};
+
 export function Form({ form, children, ...rest }: FormProps) {
   const schema = form.store((state) => state.schema);
 
@@ -66,7 +77,7 @@ export function Form({ form, children, ...rest }: FormProps) {
   return (
     <FormProvider value={form}>
       <form {...rest}>
-        <JsonSchema schema={schema} path="" />
+        <RenderSchema schema={schema} path="" />
         {children}
       </form>
     </FormProvider>

@@ -1,8 +1,10 @@
-import { getSchemaDefaultValue } from "@phalleux/jsf-schema-utils";
+import { isBooleanStartSchema } from "@phalleux/jsf-schema-utils";
+import { SchemaDefault } from "@phalleux/jsf-schema-utils/src";
 import Ajv from "ajv";
 import addFormats, { FormatName } from "ajv-formats";
 import { formatNames } from "ajv-formats/dist/formats";
 import { castDraft } from "immer";
+import { RefResolver } from "json-schema-ref-resolver";
 import { get, merge, set } from "lodash";
 
 import { createDefaultStore, createStoreUpdater } from "../store";
@@ -13,13 +15,14 @@ import {
   FormState,
   InitFormOptions,
 } from "../types/core.ts";
-import { JSONSchema } from "../types/schema.ts";
+import { FormJsonSchema } from "../types/schema.ts";
 
 const VALIDATED_FORMATS: FormatName[] = formatNames.filter(
   (format) => format !== "time" && format !== "date-time",
 );
 
 const DEFAULT_STATE: FormState = {
+  refResolver: new RefResolver(),
   schema: {},
   value: {},
   errors: null,
@@ -28,6 +31,9 @@ const DEFAULT_STATE: FormState = {
 const DEFAULT_OPTIONS: FormOptions = {
   createStore: createDefaultStore,
   schema: {},
+  defaultValue: undefined,
+  references: {},
+  renderers: [],
 };
 
 /**
@@ -49,6 +55,10 @@ export function createForm(options: InitFormOptions = {}): Form {
 
   addFormats(ajv, { formats: VALIDATED_FORMATS });
 
+  const sortedRenderers = (resolvedOptions.renderers ?? [])?.sort(
+    (a, b) => b.priority - a.priority,
+  );
+
   const state = merge({}, DEFAULT_STATE);
   const store = resolvedOptions.createStore(state);
   const storeUpdater = createStoreUpdater(store);
@@ -59,11 +69,19 @@ export function createForm(options: InitFormOptions = {}): Form {
     update: storeUpdater,
   };
 
-  const setSchema = (schema: JSONSchema) => {
+  const setSchema = (schema: FormJsonSchema) => {
     storeUpdater((state) => {
       state.schema = schema;
-      state.value = getSchemaDefaultValue(schema);
       state.errors = null;
+      state.refResolver = createRefResolver(
+        resolvedOptions.references ?? {},
+        schema,
+      );
+
+      state.value =
+        SchemaDefault.get(schema, {
+          refResolver: state.refResolver,
+        }) ?? null;
     });
   };
 
@@ -105,6 +123,21 @@ export function createForm(options: InitFormOptions = {}): Form {
     // Schema management
     getSchema: () => store.getState().schema,
     setSchema,
+    getRefSchema: (path) => {
+      const refSchema = store.getState().refResolver.getDerefSchema(path);
+      if (refSchema) {
+        return refSchema;
+      }
+      return null;
+    },
+
+    // Rendering
+    getRenderer: (schema) => {
+      const renderer = sortedRenderers.find((renderer) =>
+        renderer.tester(schema),
+      );
+      return renderer?.renderer ?? null;
+    },
 
     // Validation
     validate: () => {
@@ -138,3 +171,34 @@ export function createForm(options: InitFormOptions = {}): Form {
     },
   };
 }
+
+const createRefResolver = (
+  references: Record<string, FormJsonSchema>,
+  schema: FormJsonSchema,
+) => {
+  const refResolver = new RefResolver();
+
+  Object.entries(references).forEach(([key, value]) => {
+    refResolver.addSchema(value, value.$id ?? key);
+  });
+
+  if (schema.$defs) {
+    Object.entries(schema.$defs).forEach(([key, value]) => {
+      if (isBooleanStartSchema(value)) {
+        return;
+      }
+      refResolver.addSchema(value, value.$id ?? `#/$defs/${key}`);
+    });
+  }
+
+  if (schema.definitions) {
+    Object.entries(schema.definitions).forEach(([key, value]) => {
+      if (isBooleanStartSchema(value)) {
+        return;
+      }
+      refResolver.addSchema(value, value.$id ?? `#/definitions/${key}`);
+    });
+  }
+
+  return refResolver;
+};

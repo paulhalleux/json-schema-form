@@ -1,4 +1,4 @@
-export type JSONSchemaType =
+export type JsonSchemaType =
   | "string"
   | "number"
   | "integer"
@@ -7,7 +7,7 @@ export type JSONSchemaType =
   | "array"
   | "null";
 
-export type JSONSchema<Extension extends {} = {}> =
+export type BaseJsonSchema<Extension extends {} = any> =
   | boolean
   | (Extension & {
       $id?: string;
@@ -19,12 +19,12 @@ export type JSONSchema<Extension extends {} = {}> =
        * @see https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-00#section-8.2.4
        * @see https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00#appendix-A
        */
-      $defs?: Record<string, JSONSchema<Extension>>;
+      $defs?: Record<string, BaseJsonSchema<Extension>>;
 
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1
        */
-      type?: JSONSchemaType | JSONSchemaType[];
+      type?: JsonSchemaType | JsonSchemaType[];
       const?: unknown;
       enum?: unknown[];
 
@@ -47,9 +47,9 @@ export type JSONSchema<Extension extends {} = {}> =
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.4
        */
-      items?: JSONSchema<Extension> | JSONSchema<Extension>[];
-      additionalItems?: JSONSchema<Extension>;
-      contains?: JSONSchema<Extension>;
+      items?: BaseJsonSchema<Extension> | BaseJsonSchema<Extension>[];
+      additionalItems?: BaseJsonSchema<Extension>;
+      contains?: BaseJsonSchema<Extension>;
       maxItems?: number;
       minItems?: number;
       uniqueItems?: boolean;
@@ -60,27 +60,27 @@ export type JSONSchema<Extension extends {} = {}> =
       maxProperties?: number;
       minProperties?: number;
       required?: string[];
-      properties?: Record<string, JSONSchema<Extension>>;
-      patternProperties?: Record<string, JSONSchema<Extension>>;
-      additionalProperties?: JSONSchema<Extension>;
-      unevaluatedProperties?: JSONSchema<Extension>;
-      dependencies?: Record<string, JSONSchema<Extension> | string[]>;
-      propertyNames?: JSONSchema<Extension>;
+      properties?: Record<string, BaseJsonSchema<Extension>>;
+      patternProperties?: Record<string, BaseJsonSchema<Extension>>;
+      additionalProperties?: BaseJsonSchema<Extension>;
+      unevaluatedProperties?: BaseJsonSchema<Extension>;
+      dependencies?: Record<string, BaseJsonSchema<Extension> | string[]>;
+      propertyNames?: BaseJsonSchema<Extension>;
 
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.6
        */
-      if?: JSONSchema<Extension>;
-      then?: JSONSchema<Extension>;
-      else?: JSONSchema<Extension>;
+      if?: BaseJsonSchema<Extension>;
+      then?: BaseJsonSchema<Extension>;
+      else?: BaseJsonSchema<Extension>;
 
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.7
        */
-      allOf?: JSONSchema<Extension>[];
-      anyOf?: JSONSchema<Extension>[];
-      oneOf?: JSONSchema<Extension>[];
-      not?: JSONSchema<Extension>;
+      allOf?: BaseJsonSchema<Extension>[];
+      anyOf?: BaseJsonSchema<Extension>[];
+      oneOf?: BaseJsonSchema<Extension>[];
+      not?: BaseJsonSchema<Extension>;
 
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-7
@@ -96,7 +96,7 @@ export type JSONSchema<Extension extends {} = {}> =
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
        */
-      definitions?: Record<string, JSONSchema<Extension>>;
+      definitions?: Record<string, BaseJsonSchema<Extension>>;
 
       /**
        * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-10
@@ -109,8 +109,8 @@ export type JSONSchema<Extension extends {} = {}> =
       examples?: unknown[];
     });
 
-export type NonBooleanJSONSchema<Extension extends {} = {}> = Exclude<
-  JSONSchema<Extension>,
+export type NonBooleanBaseJsonSchema<Extension extends {} = any> = Exclude<
+  BaseJsonSchema<Extension>,
   boolean
 >;
 

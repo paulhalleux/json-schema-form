@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { mergeAllOfs } from "@phalleux/jsf-schema-utils/src";
+import { AllOfMerger } from "@phalleux/jsf-schema-utils/src";
 
 import { BaseFieldProps, JsonSchema } from "../../JsonSchema.tsx";
 
 export function AllOfField({ path, schema }: BaseFieldProps) {
-  const merged = useMemo(() => mergeAllOfs(schema), [schema]);
+  const merged = useMemo(() => AllOfMerger.merge(schema), [schema]);
   if (typeof merged !== "object") {
     return null;
   }

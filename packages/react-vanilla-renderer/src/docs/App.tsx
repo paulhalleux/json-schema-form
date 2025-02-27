@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import { javascript } from "@codemirror/lang-javascript";
-import { JSONSchema } from "@phalleux/jsf-core";
+import { FormJsonSchema } from "@phalleux/jsf-core";
+import { Form, useForm } from "@phalleux/jsf-react";
 import { vscodeLightInit } from "@uiw/codemirror-theme-vscode/src/light.ts";
 import CodeMirror from "@uiw/react-codemirror";
 import { get } from "lodash";
 
-import { Form, useForm } from "../adapter";
+import { reactVanillaRenderers } from "../renderers";
 
 import { ExampleListCategory } from "./components/ExampleListCategory.tsx";
 import jsonSchemas from "./schemas.ts";
@@ -62,9 +63,10 @@ const theme = vscodeLightInit({
 });
 const ext = [javascript()];
 
-export function SchemaDemo({ schema }: { schema: JSONSchema | null }) {
+export function SchemaDemo({ schema }: { schema: FormJsonSchema | null }) {
   const form = useForm({
     schema: schema ?? {},
+    renderers: reactVanillaRenderers,
   });
 
   const value = form.store((state) => state.value);

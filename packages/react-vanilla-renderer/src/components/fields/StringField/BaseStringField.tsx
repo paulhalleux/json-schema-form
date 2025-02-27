@@ -23,7 +23,7 @@ export function BaseStringField({
   ...fieldProps
 }: BaseStringFieldProps) {
   const { regex, min, max, type, step } = fieldProps;
-  const { value, setValue, ui, id, error } = useField<string>({
+  const { value, setValue, id, error } = useField<string>({
     schema,
     path,
   });
@@ -46,14 +46,14 @@ export function BaseStringField({
   }, [transform, value]);
 
   return (
-    <Field id={id} label={ui.label} help={ui.help} error={error}>
+    <Field id={id} label={schema.title} help={schema.$comment} error={error}>
       <Input
         type={type}
         name={id}
         id={id}
         value={transformedValue}
         onChange={onInputChange}
-        placeholder={ui.placeholder}
+        placeholder={schema.description}
         pattern={regex}
         min={min}
         max={max}

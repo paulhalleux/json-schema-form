@@ -1,20 +1,11 @@
 import { AnySchemaValue } from "@phalleux/jsf-schema-utils";
 import { ErrorObject } from "ajv";
+import { RefResolver } from "json-schema-ref-resolver";
 
 import { Register } from "./register.ts";
-import { JSONSchema } from "./schema.ts";
+import { RendererType, SchemaRenderer } from "./renderer.ts";
+import { FormJsonSchema } from "./schema.ts";
 import { StoreApi, StoreUpdater } from "./store.ts";
-
-/**
- * {@link FormFeatures}
- * ---
- * This type is used to define the features of the form
- */
-export interface FormFeatures<State, Options, Implementation> {
-  defaultState: State;
-  defaultOptions: Options;
-  create(core: FormCoreApi): Implementation;
-}
 
 /**
  * {@link FormState}
@@ -22,7 +13,8 @@ export interface FormFeatures<State, Options, Implementation> {
  * This type is used to define the state of the form
  */
 export interface FormState {
-  schema: JSONSchema;
+  refResolver: RefResolver;
+  schema: FormJsonSchema;
   value: AnySchemaValue;
   errors: ErrorObject[] | null;
 }
@@ -46,7 +38,10 @@ export type FormStore = Register extends {
  */
 export type FormOptions = {
   createStore: FormStoreFactory;
-  schema: JSONSchema;
+  schema: FormJsonSchema;
+  defaultValue?: AnySchemaValue;
+  references?: Record<string, FormJsonSchema>;
+  renderers?: Array<SchemaRenderer>;
 };
 
 /**
@@ -83,12 +78,16 @@ export interface Form extends FormCoreApi {
   getFieldValue: (path: string) => AnySchemaValue | null;
 
   // Schema management
-  getSchema: () => JSONSchema;
-  setSchema: (schema: JSONSchema) => void;
+  getSchema: () => FormJsonSchema;
+  setSchema: (schema: FormJsonSchema) => void;
+  getRefSchema: (path: string) => FormJsonSchema | null;
 
   // Validation
   validate: () => true | ErrorObject[];
   getFieldErrors: (path: string) => ErrorObject[];
+
+  // Rendering
+  getRenderer: (schema: FormJsonSchema) => RendererType | null;
 }
 
 export type FormStoreFactory = (initialState: FormState) => FormStore;

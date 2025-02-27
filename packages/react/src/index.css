@@ -1,0 +1,15 @@
+@import "@phalleux/jsf-tailwind-config";
+
+.cm-theme,
+.cm-editor {
+  height: 100%;
+  font-family: monospace !important;
+
+  .cm-gutter {
+    min-width: 32px;
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}

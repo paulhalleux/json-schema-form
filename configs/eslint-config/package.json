@@ -1,0 +1,31 @@
+{
+  "name": "@phalleux/jsf-eslint-config",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "license": "proprietary",
+  "private": true,
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
+    "@typescript-eslint/parser": "^8.23.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-n": "^17.15.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1"
+  },
+  "peerDependencies": {
+    "eslint": "^9.19.0",
+    "prettier": "^3.4.2"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.6",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
+    "globals": "^15.14.0"
+  }
+}

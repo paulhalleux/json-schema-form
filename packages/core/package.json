@@ -1,0 +1,31 @@
+{
+  "name": "@phalleux/jsf-core",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint ."
+  },
+  "main": "dist/index.es.js",
+  "types": "dist/index.es.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@phalleux/jsf-eslint-config": "^1.0.0",
+    "@phalleux/jsf-schema-utils": "^1.0.0",
+    "@phalleux/jsf-vite-config": "^1.0.0",
+    "@types/lodash": "^4.17.15",
+    "eslint": "^9.19.0",
+    "prettier": "^3.4.2",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "immer": "^10.1.1",
+    "lodash": "^4.17.21"
+  }
+}

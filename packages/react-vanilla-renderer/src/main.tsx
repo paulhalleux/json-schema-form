@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 
-import { Router } from "./docs/App.tsx";
+import { Playground } from "./docs/App.tsx";
 
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(<Router />);
+createRoot(document.getElementById("root")!).render(<Playground />);

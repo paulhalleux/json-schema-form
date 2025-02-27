@@ -30,19 +30,6 @@ export const typeTester = (type: string | string[]): SchemaTester =>
   });
 
 /**
- * Test a property of a schema
- * @param property
- * @param tester
- */
-export const propertyTester = (
-  property: string,
-  tester: SchemaTester,
-): SchemaTester =>
-  nonBooleanTester((schema) => {
-    return tester(schema.properties?.[property] ?? {});
-  });
-
-/**
  * Test if a schema is an enum schema
  */
 const isEnumSchema: SchemaTester = nonBooleanTester((schema) => {
@@ -92,6 +79,14 @@ const isNotSchema: SchemaTester = nonBooleanTester((schema) => {
 });
 
 /**
+ * Test if a schema is a string format schema
+ */
+const isStringFormatSchema: (format: string) => SchemaTester = (format) =>
+  nonBooleanTester((schema) => {
+    return typeof schema.format === "string" && schema.format === format;
+  });
+
+/**
  * Set of functions to test a schema
  */
 export const Tester = {
@@ -113,9 +108,9 @@ export const Tester = {
   isAnyOfSchema,
   isRefSchema,
   isNotSchema,
+  isStringFormatSchema,
 
   // tester factories
   nonBooleanTester,
   typeTester,
-  propertyTester,
 };

@@ -1,5 +1,5 @@
 {
-  "name": "@phalleux/jsf-react-vanilla-renderer",
+  "name": "@phalleux/jsf-playground-core",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,12 +9,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "ajv-formats": "^3.0.1",
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "zustand": "^5.0.3"
+    "react-dom": "^19.0.0"
   },
   "main": "dist/index.es.js",
   "types": "dist/index.ed.d.ts",
@@ -27,8 +25,6 @@
     "@phalleux/jsf-eslint-config": "^1.0.0",
     "@phalleux/jsf-tailwind-config": "^1.0.0",
     "@phalleux/jsf-vite-config": "^1.0.0",
-    "@phalleux/jsf-react": "^1.0.0",
-    "@phalleux/jsf-playground-core": "^1.0.0",
     "@types/css-modules": "^1.0.5",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",

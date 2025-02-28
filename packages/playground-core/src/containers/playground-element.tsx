@@ -1,6 +1,7 @@
 import { createRoot, Root } from "react-dom/client";
 import { Form } from "@phalleux/jsf-core";
 
+import { examples } from "../examples";
 import css from "../index.css?inline";
 import { SchemaExampleCategory } from "../types/examples.ts";
 
@@ -47,13 +48,19 @@ export class PlaygroundHTMLElement extends HTMLElement {
   }
 
   render() {
-    if (!this.form || !this.examples) {
+    if (!this.form) {
+      this.reactRoot.render(
+        <div className="px-4 py-3">Missing form instance</div>,
+      );
       return;
     }
 
     this.reactRoot.render(
-      <Playground form={this.form} examples={this.examples}>
-        <slot id="react-root" />
+      <Playground
+        form={this.form}
+        examples={[...(this.examples ?? []), ...examples]}
+      >
+        <slot />
       </Playground>,
     );
   }

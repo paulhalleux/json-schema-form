@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { clsx } from "clsx";
 
 type NavButtonProps = React.PropsWithChildren<{
@@ -7,7 +7,7 @@ type NavButtonProps = React.PropsWithChildren<{
   className?: string;
 }>;
 
-export function NavButton({
+export const NavButton = memo(function NavButton({
   children,
   onClick,
   active,
@@ -28,4 +28,4 @@ export function NavButton({
       {children}
     </button>
   );
-}
+});

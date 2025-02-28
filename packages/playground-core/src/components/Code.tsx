@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import { vscodeLightInit } from "@uiw/codemirror-theme-vscode/src/light.ts";
 import ReactCodeMirror from "@uiw/react-codemirror";
@@ -10,7 +11,7 @@ const theme = vscodeLightInit({
   },
 });
 
-export function Code({ value }: { value: string }) {
+export const Code = memo(function Code({ value }: { value: string }) {
   return (
     <ReactCodeMirror
       theme={theme}
@@ -23,4 +24,4 @@ export function Code({ value }: { value: string }) {
       }}
     />
   );
-}
+});

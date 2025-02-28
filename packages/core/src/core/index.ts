@@ -46,14 +46,9 @@ const DEFAULT_OPTIONS: FormOptions = {
 export function createForm(options: InitFormOptions = {}): Form {
   const resolvedOptions = merge({}, DEFAULT_OPTIONS, options) as FormOptions;
 
-  const ajv = new Ajv({
-    formats: {
-      time: true,
-      "date-time": true,
-    },
-  });
+  const ajv = new Ajv();
 
-  addFormats(ajv, { formats: VALIDATED_FORMATS });
+  addFormats(ajv, { formats: VALIDATED_FORMATS, keywords: true });
 
   const sortedRenderers = (resolvedOptions.renderers ?? [])?.sort(
     (a, b) => b.priority - a.priority,

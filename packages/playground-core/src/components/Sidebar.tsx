@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useNavigate } from "react-router";
 import { clsx } from "clsx";
 
@@ -11,11 +12,14 @@ type SidebarProps = {
   examples: SchemaExampleCategory["children"];
 };
 
-export function Sidebar({ activeExampleId, examples }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({
+  activeExampleId,
+  examples,
+}: SidebarProps) {
   return (
     <div
       className={clsx([
-        "w-80 h-full",
+        "w-80 h-full shrink-0",
         "bg-white border-r border-neutral-300",
         "overflow-y-auto",
       ])}
@@ -34,9 +38,9 @@ export function Sidebar({ activeExampleId, examples }: SidebarProps) {
       </div>
     </div>
   );
-}
+});
 
-function CategoryOrExample({
+const CategoryOrExample = memo(function CategoryOrExample({
   activeExampleId,
   categoryOrExample,
 }: {
@@ -46,7 +50,10 @@ function CategoryOrExample({
   const navigate = useNavigate();
   if ("children" in categoryOrExample) {
     return (
-      <Collapsible title={categoryOrExample.title}>
+      <Collapsible
+        title={categoryOrExample.title}
+        defaultOpen={isChild(activeExampleId, categoryOrExample)}
+      >
         <div className="pl-3.5 ml-3.5 border-l border-neutral-300 flex flex-col">
           {categoryOrExample.children.map((child) => (
             <CategoryOrExample
@@ -68,4 +75,12 @@ function CategoryOrExample({
       </NavButton>
     );
   }
-}
+});
+
+const isChild = (
+  activeExampleId: string | undefined,
+  example: SchemaExample | SchemaExampleCategory,
+): boolean =>
+  activeExampleId === example.id ||
+  ("children" in example &&
+    example.children.some((child) => isChild(activeExampleId, child)));

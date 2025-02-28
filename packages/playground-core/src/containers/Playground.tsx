@@ -1,4 +1,5 @@
 import {
+  memo,
   PropsWithChildren,
   useEffect,
   useMemo,
@@ -17,7 +18,7 @@ type PlaygroundProps = PropsWithChildren<{
   examples: SchemaExampleCategory["children"];
 }>;
 
-export function Playground(props: PlaygroundProps) {
+export const Playground = memo(function Playground(props: PlaygroundProps) {
   return (
     <BrowserRouter>
       <Routes>
@@ -28,9 +29,17 @@ export function Playground(props: PlaygroundProps) {
       </Routes>
     </BrowserRouter>
   );
-}
+});
 
-const PlaygroundContent = ({ examples, children, form }: PlaygroundProps) => {
+const schemaSelector = (state: FormState) => state.schema;
+const valueSelector = (state: FormState) => state.value;
+const errorsSelector = (state: FormState) => state.errors;
+
+const PlaygroundContent = memo(function PlaygroundContent({
+  examples,
+  children,
+  form,
+}: PlaygroundProps) {
   const { activeExampleId } = useParams<{ activeExampleId: string }>();
 
   const example = useMemo(() => {
@@ -39,10 +48,6 @@ const PlaygroundContent = ({ examples, children, form }: PlaygroundProps) => {
     }
     return find(examples, activeExampleId);
   }, [activeExampleId, examples]);
-
-  const schema = useFormStore(form, (state) => state.schema);
-  const value = useFormStore(form, (state) => state.value);
-  const errors = useFormStore(form, (state) => state.errors);
 
   useEffect(() => {
     if (!example) {
@@ -58,19 +63,40 @@ const PlaygroundContent = ({ examples, children, form }: PlaygroundProps) => {
         <PlaygroundSection title="Result" cols={2} rows={2}>
           {children}
         </PlaygroundSection>
-        <PlaygroundSection title="Schema" cols={2} rows={1}>
-          <Code value={JSON.stringify(schema, null, 2)} />
-        </PlaygroundSection>
-        <PlaygroundSection title="Data" cols={1} rows={1}>
-          <Code value={JSON.stringify(value, null, 2)} />
-        </PlaygroundSection>
-        <PlaygroundSection title="Errors" cols={1} rows={1}>
-          <Code value={JSON.stringify(errors, null, 2)} />
-        </PlaygroundSection>
+        <SchemaDisplay form={form} />
+        <ValueDisplay form={form} />
+        <ErrorsDisplay form={form} />
       </div>
     </div>
   );
-};
+});
+
+const SchemaDisplay = memo(function SchemaDisplay({ form }: { form: Form }) {
+  const schema = useFormStore(form, schemaSelector);
+  return (
+    <PlaygroundSection title="Schema" cols={2} rows={1}>
+      <Code value={JSON.stringify(schema, null, 2)} />
+    </PlaygroundSection>
+  );
+});
+
+const ValueDisplay = memo(function ValueDisplay({ form }: { form: Form }) {
+  const value = useFormStore(form, valueSelector);
+  return (
+    <PlaygroundSection title="Data" cols={1} rows={1}>
+      <Code value={JSON.stringify(value, null, 2)} />
+    </PlaygroundSection>
+  );
+});
+
+const ErrorsDisplay = memo(function ErrorsDisplay({ form }: { form: Form }) {
+  const errors = useFormStore(form, errorsSelector);
+  return (
+    <PlaygroundSection title="Errors" cols={1} rows={1}>
+      <Code value={JSON.stringify(errors, null, 2)} />
+    </PlaygroundSection>
+  );
+});
 
 const find = (
   examples: SchemaExampleCategory["children"],

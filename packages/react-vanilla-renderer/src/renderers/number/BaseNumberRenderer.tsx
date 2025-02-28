@@ -4,21 +4,19 @@ import { BaseRendererProps } from "@phalleux/jsf-core";
 import { Field, Input } from "../../components";
 import { useField } from "../../hooks/useField";
 
-export type BaseStringRendererProps = BaseRendererProps & {
-  type?: string;
-  regex?: string;
+export type BaseNumberRendererProps = BaseRendererProps & {
   min?: number | string;
   max?: number | string;
   step?: number | string;
 };
 
-export function BaseStringRenderer({
+export function BaseNumberRenderer({
   schema,
   path,
   ...fieldProps
-}: BaseStringRendererProps) {
-  const { regex, min, max, type, step } = fieldProps;
-  const { value, setValue, id, error } = useField<string>({
+}: BaseNumberRendererProps) {
+  const { min, max, step } = fieldProps;
+  const { value, setValue, id, error } = useField<number>({
     schema,
     path,
   });
@@ -26,7 +24,12 @@ export function BaseStringRenderer({
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
-      setValue(value);
+      if (value === "") {
+        setValue(null);
+      } else {
+        if (!isNaN(Number(value))) setValue(Number(value));
+        else setValue(null);
+      }
     },
     [setValue],
   );
@@ -34,13 +37,12 @@ export function BaseStringRenderer({
   return (
     <Field id={id} label={schema.title} help={schema.$comment} error={error}>
       <Input
-        type={type}
+        type="number"
         name={id}
         id={id}
         value={value ?? ""}
         onChange={onInputChange}
         placeholder={schema.description}
-        pattern={regex}
         min={min}
         max={max}
         minLength={typeof min === "number" ? min : undefined}

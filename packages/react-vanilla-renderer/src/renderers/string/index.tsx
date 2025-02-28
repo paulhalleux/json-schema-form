@@ -2,7 +2,7 @@ import { SchemaRenderer } from "@phalleux/jsf-core";
 import { Tester } from "@phalleux/jsf-schema-utils";
 
 import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
-import { emailFormatRenderer } from "./formats";
+import { formats } from "./formats";
 
 const defaultStringRenderer: SchemaRenderer = {
   tester: Tester.isStringSchema,
@@ -19,4 +19,4 @@ const defaultStringRenderer: SchemaRenderer = {
   ),
 };
 
-export const stringRenderers = [defaultStringRenderer, emailFormatRenderer];
+export const stringRenderers = [defaultStringRenderer, ...formats];

@@ -6,8 +6,8 @@ import {
 import { Tester } from "@phalleux/jsf-schema-utils";
 
 import {
-  BaseStringFieldProps,
   BaseStringRenderer,
+  BaseStringRendererProps,
 } from "./BaseStringRenderer.tsx";
 
 /**
@@ -21,15 +21,25 @@ export const createFormatRenderer = ({
   priority = 1,
   getProps,
 }: {
-  format: string;
+  format: string | string[];
   priority?: number;
   getProps: (
     schema: FormJsonSchema,
-  ) => Omit<BaseStringFieldProps, keyof BaseRendererProps>;
+  ) => Omit<BaseStringRendererProps, keyof BaseRendererProps>;
 }): SchemaRenderer => ({
-  tester: Tester.isStringFormatSchema(format),
+  tester: Array.isArray(format)
+    ? (schema) => format.map(Tester.isStringFormatSchema).some((t) => t(schema))
+    : Tester.isStringFormatSchema(format),
   priority,
   renderer: ({ schema, path }) => (
-    <BaseStringRenderer schema={schema} path={path} {...getProps(schema)} />
+    <BaseStringRenderer
+      schema={schema}
+      path={path}
+      type="text"
+      min={schema.minLength}
+      max={schema.maxLength}
+      regex={schema.pattern}
+      {...getProps(schema)}
+    />
   ),
 });

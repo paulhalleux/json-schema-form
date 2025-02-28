@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { memo, PropsWithChildren } from "react";
 
 type PlaygroundSectionProps = PropsWithChildren<{
   title: string;
@@ -6,12 +6,12 @@ type PlaygroundSectionProps = PropsWithChildren<{
   rows?: number;
 }>;
 
-export const PlaygroundSection = ({
+export const PlaygroundSection = memo(function PlaygroundSection({
   title,
   children,
   rows = 1,
   cols = 1,
-}: PlaygroundSectionProps) => {
+}: PlaygroundSectionProps) {
   return (
     <div
       className="flex flex-col gap-1"
@@ -26,4 +26,4 @@ export const PlaygroundSection = ({
       </div>
     </div>
   );
-};
+});

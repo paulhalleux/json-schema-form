@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { BaseRendererProps } from "@phalleux/jsf-core";
+import { useField } from "@phalleux/jsf-react";
 
 import { Field, Input } from "../../components";
-import { useField } from "../../hooks/useField";
 
 export type BaseNumberRendererProps = BaseRendererProps & {
   min?: number | string;
@@ -17,7 +17,6 @@ export function BaseNumberRenderer({
 }: BaseNumberRendererProps) {
   const { min, max, step } = fieldProps;
   const { value, setValue, id, error } = useField<number>({
-    schema,
     path,
   });
 

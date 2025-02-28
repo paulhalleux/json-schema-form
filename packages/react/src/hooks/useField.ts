@@ -1,11 +1,13 @@
 import { useCallback } from "react";
-import { BaseRendererProps } from "@phalleux/jsf-core";
-import { useFormInstance, useStore } from "@phalleux/jsf-react";
 import { AnySchemaValue } from "@phalleux/jsf-schema-utils";
 
-export function useField<T extends AnySchemaValue>({
-  path,
-}: BaseRendererProps) {
+import { useFormInstance, useStore } from "../adapter";
+
+type UseFieldArgs = {
+  path: string;
+};
+
+export function useField<T extends AnySchemaValue>({ path }: UseFieldArgs) {
   const instance = useFormInstance();
 
   const value = useStore((_, form) => form.getFieldValue(path) as T | null);

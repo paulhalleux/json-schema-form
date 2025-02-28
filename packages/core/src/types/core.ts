@@ -87,7 +87,10 @@ export interface Form extends FormCoreApi {
   getFieldErrors: (path: string) => ErrorObject[];
 
   // Rendering
-  getRenderer: (schema: FormJsonSchema) => RendererType | null;
+  getRenderer: (
+    schema: FormJsonSchema,
+    previousRenderers: string[],
+  ) => RendererType | null;
 }
 
 export type FormStoreFactory = (initialState: FormState) => FormStore;

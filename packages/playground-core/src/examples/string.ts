@@ -28,6 +28,39 @@ export const StringExamples: SchemaExampleCategory = {
       },
     },
     {
+      id: "string-all-of",
+      title: "All Of",
+      schema: {
+        type: "string",
+        title: "String",
+        description: "A simple string",
+        allOf: [
+          {
+            minLength: 5,
+          },
+          {
+            maxLength: 10,
+          },
+        ],
+      },
+    },
+    {
+      id: "string-ref",
+      title: "Ref",
+      schema: {
+        definitions: {
+          string: {
+            minLength: 5,
+            maxLength: 10,
+          },
+        },
+        type: "string",
+        title: "String",
+        description: "A simple string",
+        $ref: "#/definitions/string",
+      },
+    },
+    {
       id: "string-formats",
       title: "Formats",
       children: formatNames
@@ -106,8 +139,30 @@ export const StringExamples: SchemaExampleCategory = {
             title: "Time",
             description: "A time string with min and max",
             format: "time",
-            formatMinimum: "00:00",
-            formatMaximum: "12:00",
+            formatMinimum: "00:00:00",
+            formatMaximum: "12:00:00",
+          },
+        },
+        {
+          id: "string-time-iso",
+          title: "ISO Time",
+          schema: {
+            type: "string",
+            title: "Time",
+            description: "A time string",
+            format: "iso-time",
+          },
+        },
+        {
+          id: "string-time-min-max-iso",
+          title: "ISO Time with min and max",
+          schema: {
+            type: "string",
+            title: "Time",
+            description: "A time string with min and max",
+            format: "iso-time",
+            formatMinimum: "00:00:00",
+            formatMaximum: "12:00:00",
           },
         },
       ],
@@ -134,8 +189,30 @@ export const StringExamples: SchemaExampleCategory = {
             title: "Date Time",
             description: "A date-time string with min and max",
             format: "date-time",
-            formatMinimum: "2020-01-01T00:00Z",
-            formatMaximum: "2021-01-01T12:00Z",
+            formatMinimum: "2020-01-01T00:00:00Z",
+            formatMaximum: "2021-01-01T12:00:00Z",
+          },
+        },
+        {
+          id: "string-date-time-iso",
+          title: "ISO Date Time",
+          schema: {
+            type: "string",
+            title: "Date Time",
+            description: "A date-time string",
+            format: "iso-date-time",
+          },
+        },
+        {
+          id: "string-date-time-min-max-iso",
+          title: "ISO Date Time with min and max",
+          schema: {
+            type: "string",
+            title: "Date Time",
+            description: "A date-time string with min and max",
+            format: "iso-date-time",
+            formatMinimum: "2020-01-01T00:00:00Z",
+            formatMaximum: "2021-01-01T12:00:00Z",
           },
         },
       ],

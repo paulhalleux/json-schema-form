@@ -6,6 +6,6 @@ export const dateTimeFormatRenderer = createFormatRenderer({
     type: "datetime-local",
     min: schema.formatMinimum ?? schema.formatExclusiveMinimum,
     max: schema.formatMaximum ?? schema.formatExclusiveMaximum,
-    step: schema.formatStep,
+    step: schema.formatStep ?? "1",
   }),
 });

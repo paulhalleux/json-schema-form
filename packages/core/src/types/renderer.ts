@@ -1,4 +1,5 @@
 import { SchemaTester } from "@phalleux/jsf-schema-utils";
+import Ajv from "ajv";
 
 import { Register } from "./register.ts";
 import { FormJsonSchema } from "./schema.ts";
@@ -9,8 +10,25 @@ import { FormJsonSchema } from "./schema.ts";
  * This type is used to define the base props for a renderer
  */
 export type BaseRendererProps = {
+  /**
+   * The path of the schema
+   */
   path: string;
+  /**
+   * The schema to render
+   */
   schema: FormJsonSchema;
+  /**
+   * The parent schema of the current schema
+   */
+  parentSchema: FormJsonSchema | undefined;
+
+  /**
+   * The previous renderers that were used
+   * This is used to allow for the renderer to know what renderers were used before
+   * and avoid rendering the same renderer multiple times for the same schema
+   */
+  previousRenderers: string[];
 };
 
 /**
@@ -32,7 +50,28 @@ export type RendererType = Register extends {
  * It defines the priority, tester and renderer for a schema renderer
  */
 export type SchemaRenderer = {
-  priority: number;
+  /**
+   * The id of the renderer
+   * This is used to identify the renderer.
+   * It should be unique for each renderer.
+   */
+  id: string;
+  /**
+   * The priority of the renderer
+   * Higher priority renderers will be used first
+   */
+  priority?: number;
+  /**
+   * The tester to determine if the renderer should be used
+   */
   tester: SchemaTester;
+  /**
+   * The renderer to render the schema
+   */
   renderer: RendererType;
+  /**
+   * Define validation for the schema
+   * @param ajv The ajv instance to define validation
+   */
+  defineValidation?: (ajv: Ajv) => void;
 };

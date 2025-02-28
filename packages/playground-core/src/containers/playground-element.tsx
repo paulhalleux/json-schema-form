@@ -1,3 +1,4 @@
+import React from "react";
 import { createRoot, Root } from "react-dom/client";
 import { Form } from "@phalleux/jsf-core";
 
@@ -17,24 +18,15 @@ export class PlaygroundHTMLElement extends HTMLElement {
   constructor() {
     super();
     this.root = this.attachShadow({ mode: "open" });
+    this.reactRoot = createRoot(this.root);
 
     const style = document.createElement("style");
     style.textContent = css;
     this.root.appendChild(style);
-
-    const reactContainer = document.createElement("div");
-    reactContainer.setAttribute("id", "react-root");
-    this.root.appendChild(reactContainer);
-
-    this.reactRoot = createRoot(reactContainer);
   }
 
   connectedCallback() {
     this.render();
-  }
-
-  disconnectedCallback() {
-    this.reactRoot.unmount();
   }
 
   setForm(form: Form) {
@@ -49,19 +41,19 @@ export class PlaygroundHTMLElement extends HTMLElement {
 
   render() {
     if (!this.form) {
-      this.reactRoot.render(
-        <div className="px-4 py-3">Missing form instance</div>,
-      );
       return;
     }
 
     this.reactRoot.render(
-      <Playground
-        form={this.form}
-        examples={[...(this.examples ?? []), ...examples]}
-      >
-        <slot />
-      </Playground>,
+      <React.StrictMode>
+        <Playground
+          name={this.dataset.name ?? "Json Schema Form"}
+          form={this.form}
+          examples={[...(this.examples ?? []), ...examples]}
+        >
+          <slot />
+        </Playground>
+      </React.StrictMode>,
     );
   }
 }

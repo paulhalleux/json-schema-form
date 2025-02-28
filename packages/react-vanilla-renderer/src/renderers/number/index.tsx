@@ -4,12 +4,15 @@ import { Tester } from "@phalleux/jsf-schema-utils";
 import { BaseNumberRenderer } from "./BaseNumberRenderer.tsx";
 
 const defaultNumberRenderer: SchemaRenderer = {
-  tester: Tester.isNumericSchema,
+  id: "react-vanilla.number.default",
+  tester: Tester((builder) => {
+    builder.withType("number");
+  }),
   priority: 0,
-  renderer: ({ schema, path }) => (
+  renderer: ({ schema, ...props }) => (
     <BaseNumberRenderer
       schema={schema}
-      path={path}
+      {...props}
       min={
         schema.minimum === undefined && schema.exclusiveMinimum !== undefined
           ? schema.exclusiveMinimum + 1

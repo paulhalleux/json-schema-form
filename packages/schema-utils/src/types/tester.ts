@@ -1,4 +1,4 @@
-import { BaseJsonSchema } from "./schema.ts";
+import { NonBooleanBaseJsonSchema } from "./schema.ts";
 
 /**
  * {@link SchemaTester}
@@ -8,5 +8,5 @@ import { BaseJsonSchema } from "./schema.ts";
  * @returns True if the schema is supported
  */
 export type SchemaTester = <Ext extends {}>(
-  schema: BaseJsonSchema<Ext>,
+  schema: NonBooleanBaseJsonSchema<Ext>,
 ) => boolean;

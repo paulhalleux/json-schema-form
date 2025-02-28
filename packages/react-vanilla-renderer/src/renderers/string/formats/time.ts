@@ -6,6 +6,6 @@ export const timeFormatRenderer = createFormatRenderer({
     type: "time",
     min: schema.formatMinimum ?? schema.formatExclusiveMinimum,
     max: schema.formatMaximum ?? schema.formatExclusiveMaximum,
-    step: schema.formatStep,
+    step: schema.formatStep ?? "1",
   }),
 });

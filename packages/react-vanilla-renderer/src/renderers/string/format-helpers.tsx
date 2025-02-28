@@ -27,14 +27,20 @@ export const createFormatRenderer = ({
     schema: FormJsonSchema,
   ) => Omit<BaseStringRendererProps, keyof BaseRendererProps>;
 }): SchemaRenderer => ({
-  tester: Array.isArray(format)
-    ? (schema) => format.map(Tester.isStringFormatSchema).some((t) => t(schema))
-    : Tester.isStringFormatSchema(format),
+  id: `react-vanilla.string.format.${format}`,
+  tester: Tester((builder) => {
+    builder.withType("string");
+    if (Array.isArray(format)) {
+      format.forEach((f) => builder.withFormat(f));
+    } else {
+      builder.withFormat(format);
+    }
+  }),
   priority,
-  renderer: ({ schema, path }) => (
+  renderer: ({ schema, ...props }) => (
     <BaseStringRenderer
       schema={schema}
-      path={path}
+      {...props}
       type="text"
       min={schema.minLength}
       max={schema.maxLength}

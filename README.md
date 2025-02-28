@@ -20,3 +20,7 @@ Vanilla renderer for `@phalleux/jsf-react` providing some basic components to re
 ### `@phalleux/jsf-schema-utils`
 
 Utility functions to manipulate JSON Schema.
+
+## Visual
+
+![img.png](img.png)

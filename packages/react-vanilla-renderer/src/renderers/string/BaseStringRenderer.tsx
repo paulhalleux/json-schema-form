@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { BaseRendererProps } from "@phalleux/jsf-core";
+import { useField } from "@phalleux/jsf-react";
 
 import { Field, Input } from "../../components";
-import { useField } from "../../hooks/useField";
 
 export type BaseStringRendererProps = BaseRendererProps & {
   type?: string;
@@ -19,7 +19,6 @@ export function BaseStringRenderer({
 }: BaseStringRendererProps) {
   const { regex, min, max, type, step } = fieldProps;
   const { value, setValue, id, error } = useField<string>({
-    schema,
     path,
   });
 

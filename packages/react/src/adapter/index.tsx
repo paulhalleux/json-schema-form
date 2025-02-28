@@ -8,24 +8,26 @@ import {
   InitFormOptions,
 } from "@phalleux/jsf-core";
 import { isEqual } from "lodash";
-import { create, UseBoundStore } from "zustand/react";
+import { create } from "zustand/react";
 import { useShallow } from "zustand/react/shallow";
-import { StoreApi } from "zustand/vanilla";
 
-declare module "@phalleux/jsf-core" {
-  export interface Register {
-    store: UseBoundStore<StoreApi<FormState>>;
-    rendererType: React.ComponentType<BaseRendererProps>;
-  }
-}
+import { allOfRenderer } from "../renderers/all-of-renderer.tsx";
+import { objectRenderer } from "../renderers/object-renderer.tsx";
+import { refRenderer } from "../renderers/ref-renderer.tsx";
 
 export const createZustandStore = (initialState: FormState): FormStore => {
   return create(() => initialState);
 };
 
+const BUILT_IN_RENDERERS = [allOfRenderer, refRenderer, objectRenderer];
+
 export function useForm(options: InitFormOptions = {}) {
   const [form] = useState(() =>
-    createForm({ createStore: createZustandStore, ...options }),
+    createForm({
+      createStore: createZustandStore,
+      ...options,
+      renderers: [...(options.renderers ?? []), ...BUILT_IN_RENDERERS],
+    }),
   );
 
   const prevSchema = useRef(options.schema);
@@ -58,15 +60,27 @@ export type FormProps = {
   form: Form;
 } & React.ComponentProps<"form">;
 
-export const RenderSchema = ({ schema, path }: BaseRendererProps) => {
+export const RenderSchema = ({
+  schema,
+  path,
+  parentSchema,
+  previousRenderers,
+}: BaseRendererProps) => {
   const instance = useFormInstance();
   const Renderer = useMemo(() => {
-    return instance.getRenderer(schema);
-  }, [instance, schema]);
+    return instance.getRenderer(schema, previousRenderers);
+  }, [instance, previousRenderers, schema]);
 
   if (!Renderer) return "No renderer found";
 
-  return <Renderer schema={schema} path={path} />;
+  return (
+    <Renderer
+      schema={schema}
+      path={path}
+      parentSchema={parentSchema}
+      previousRenderers={previousRenderers}
+    />
+  );
 };
 
 export function Form({ form, children, ...rest }: FormProps) {
@@ -77,7 +91,12 @@ export function Form({ form, children, ...rest }: FormProps) {
   return (
     <FormProvider value={form}>
       <form {...rest}>
-        <RenderSchema schema={schema} path="" />
+        <RenderSchema
+          schema={schema}
+          path=""
+          parentSchema={undefined}
+          previousRenderers={[]}
+        />
         {children}
       </form>
     </FormProvider>

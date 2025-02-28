@@ -11,14 +11,23 @@ const theme = vscodeLightInit({
   },
 });
 
-export const Code = memo(function Code({ value }: { value: string }) {
+export const Code = memo(function Code({
+  value,
+  editable,
+  onChange,
+}: {
+  value: string;
+  editable?: boolean;
+  onChange?: (value: string) => void;
+}) {
   return (
     <ReactCodeMirror
       theme={theme}
       extensions={ext}
       height="100%"
       value={value}
-      readOnly
+      onChange={onChange}
+      readOnly={!editable}
       basicSetup={{
         foldGutter: false,
       }}

@@ -32,7 +32,7 @@ const examples: SchemaExampleCategory[] = Array.from(
 export function App() {
   const [form] = useState(() => createForm());
   return (
-    <Playground examples={examples} form={form}>
+    <Playground examples={examples} form={form} name={"Playground"}>
       Form renderer goes here
     </Playground>
   );

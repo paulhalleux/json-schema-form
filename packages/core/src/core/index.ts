@@ -1,5 +1,7 @@
-import { isBooleanStartSchema } from "@phalleux/jsf-schema-utils";
-import { SchemaDefault } from "@phalleux/jsf-schema-utils/src";
+import {
+  isBooleanStartSchema,
+  SchemaDefault,
+} from "@phalleux/jsf-schema-utils";
 import Ajv from "ajv";
 import addFormats, { FormatName } from "ajv-formats";
 import { formatNames } from "ajv-formats/dist/formats";
@@ -16,6 +18,7 @@ import {
   InitFormOptions,
 } from "../types/core.ts";
 import { FormJsonSchema } from "../types/schema.ts";
+import { getValuePath } from "../utils/error.ts";
 
 const VALIDATED_FORMATS: FormatName[] = formatNames.filter(
   (format) => format !== "time" && format !== "date-time",
@@ -46,13 +49,21 @@ const DEFAULT_OPTIONS: FormOptions = {
 export function createForm(options: InitFormOptions = {}): Form {
   const resolvedOptions = merge({}, DEFAULT_OPTIONS, options) as FormOptions;
 
-  const ajv = new Ajv();
+  const ajv = new Ajv({ strict: false });
 
   addFormats(ajv, { formats: VALIDATED_FORMATS, keywords: true });
 
   const sortedRenderers = (resolvedOptions.renderers ?? [])?.sort(
-    (a, b) => b.priority - a.priority,
+    (a, b) => (b.priority ?? 0) - (a.priority ?? 0),
   );
+
+  // Define validation for all renderers
+  for (const sortedRenderersKey in sortedRenderers) {
+    const renderer = sortedRenderers[sortedRenderersKey];
+    if (renderer.defineValidation) {
+      renderer.defineValidation(ajv);
+    }
+  }
 
   const state = merge({}, DEFAULT_STATE);
   const store = resolvedOptions.createStore(state);
@@ -95,22 +106,23 @@ export function createForm(options: InitFormOptions = {}): Form {
 
     // Field value management
     getFieldValue: (path: string) => {
-      if (path === "") {
+      const sanitizedPath = path.startsWith(".") ? path.slice(1) : path;
+      if (sanitizedPath === "") {
         return store.getState().value;
       }
-      return get(store.getState().value, path) ?? null;
+      return get(store.getState().value, sanitizedPath) ?? null;
     },
-
     setFieldValue: (path, value) => {
+      const sanitizedPath = path.startsWith(".") ? path.slice(1) : path;
       storeUpdater((state) => {
-        if (path === "") {
+        if (sanitizedPath === "") {
           state.value = value;
         } else if (
           typeof state.value === "object" ||
           typeof state.value === "undefined" ||
           state.value === null
         ) {
-          state.value = set(state.value ?? {}, path, value);
+          state.value = set(state.value ?? {}, sanitizedPath, value);
         }
       });
     },
@@ -127,10 +139,10 @@ export function createForm(options: InitFormOptions = {}): Form {
     },
 
     // Rendering
-    getRenderer: (schema) => {
-      const renderer = sortedRenderers.find((renderer) =>
-        renderer.tester(schema),
-      );
+    getRenderer: (schema, previousRenderers) => {
+      const renderer = sortedRenderers
+        .filter((renderer) => !previousRenderers.includes(renderer.id))
+        .find((renderer) => renderer.tester(schema));
       return renderer?.renderer ?? null;
     },
 
@@ -162,7 +174,7 @@ export function createForm(options: InitFormOptions = {}): Form {
       if (path === "") {
         return errors;
       }
-      return errors.filter((error) => error.instancePath === path);
+      return errors.filter((error) => getValuePath(error) === path);
     },
   };
 }

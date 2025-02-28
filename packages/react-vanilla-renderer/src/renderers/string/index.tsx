@@ -5,12 +5,15 @@ import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
 import { formats } from "./formats";
 
 const defaultStringRenderer: SchemaRenderer = {
-  tester: Tester.isStringSchema,
+  id: "react-vanilla.string.default",
+  tester: Tester((builder) => {
+    builder.withType("string");
+  }),
   priority: 0,
-  renderer: ({ schema, path }) => (
+  renderer: ({ schema, ...props }) => (
     <BaseStringRenderer
       schema={schema}
-      path={path}
+      {...props}
       type="text"
       min={schema.minLength}
       max={schema.maxLength}

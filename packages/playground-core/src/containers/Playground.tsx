@@ -1,16 +1,20 @@
 import {
   memo,
-  PropsWithChildren,
+  type PropsWithChildren,
   useEffect,
   useMemo,
   useSyncExternalStore,
 } from "react";
 import { Outlet, Route, Routes, useParams } from "react-router";
 import { BrowserRouter } from "react-router-dom";
-import { Form, FormState } from "@phalleux/jsf-core";
+
+import type { Form, FormState } from "@phalleux/jsf-core";
 
 import { Code, PlaygroundSection, Sidebar } from "../components";
-import { SchemaExample, SchemaExampleCategory } from "../types/examples.ts";
+import type {
+  SchemaExample,
+  SchemaExampleCategory,
+} from "../types/examples.ts";
 
 type PlaygroundProps = PropsWithChildren<{
   name: string;

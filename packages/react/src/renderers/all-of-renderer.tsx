@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
+
+import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
 import {
   AllOfMerger,
   isBooleanStartSchema,

@@ -1,4 +1,4 @@
-import { NonBooleanBaseJsonSchema } from "@phalleux/jsf-schema-utils";
+import type { NonBooleanBaseJsonSchema } from "@phalleux/jsf-schema-utils";
 
 /**
  * Json Schema extension for form

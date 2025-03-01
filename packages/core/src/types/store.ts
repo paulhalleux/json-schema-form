@@ -1,4 +1,4 @@
-import { WritableDraft } from "immer";
+import type { WritableDraft } from "immer";
 
 /**
  * {@link StoreApi}

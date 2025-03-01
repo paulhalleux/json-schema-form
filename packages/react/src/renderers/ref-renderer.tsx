@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import { isBooleanStartSchema, Tester } from "@phalleux/jsf-schema-utils";
 import { merge, omit } from "lodash";
+
+import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
+import { isBooleanStartSchema, Tester } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema, useFormInstance } from "../adapter";
 

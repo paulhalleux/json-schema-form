@@ -1,5 +1,5 @@
-export * from "./types/schema.ts";
-export * from "./types/tester.ts";
+export type * from "./types/schema.ts";
+export type * from "./types/tester.ts";
 
 export * from "./utils/testers.ts";
 export * from "./utils/one-of-splitter.ts";

@@ -1,6 +1,6 @@
 import { formatNames } from "ajv-formats/dist/formats";
 
-import { SchemaExampleCategory } from "../types/examples.ts";
+import type { SchemaExampleCategory } from "../types/examples.ts";
 
 export const StringExamples: SchemaExampleCategory = {
   id: "string",

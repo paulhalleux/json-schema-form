@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     dts({
       insertTypesEntry: true,
-      tsconfigPath: resolve(process.cwd(), "tsconfig.app.json"),
+      tsconfigPath: resolve(process.cwd(), "tsconfig.json"),
     }),
     tailwindcss(),
   ],

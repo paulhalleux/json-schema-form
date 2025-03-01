@@ -1,23 +1,24 @@
-import {
-  isBooleanStartSchema,
-  SchemaDefault,
-} from "@phalleux/jsf-schema-utils";
 import Ajv from "ajv";
-import addFormats, { FormatName } from "ajv-formats";
+import addFormats, { type FormatName } from "ajv-formats";
 import { formatNames } from "ajv-formats/dist/formats";
 import { castDraft } from "immer";
 import { RefResolver } from "json-schema-ref-resolver";
 import { get, merge, set } from "lodash";
 
-import { createDefaultStore, createStoreUpdater } from "../store";
 import {
+  isBooleanStartSchema,
+  SchemaDefault,
+} from "@phalleux/jsf-schema-utils";
+
+import { createDefaultStore, createStoreUpdater } from "../store";
+import type {
   Form,
   FormCoreApi,
   FormOptions,
   FormState,
   InitFormOptions,
 } from "../types/core.ts";
-import { FormJsonSchema } from "../types/schema.ts";
+import type { FormJsonSchema } from "../types/schema.ts";
 import { getValuePath } from "../utils/error.ts";
 
 const VALIDATED_FORMATS: FormatName[] = formatNames.filter(
@@ -60,7 +61,7 @@ export function createForm(options: InitFormOptions = {}): Form {
   // Define validation for all renderers
   for (const sortedRenderersKey in sortedRenderers) {
     const renderer = sortedRenderers[sortedRenderersKey];
-    if (renderer.defineValidation) {
+    if (renderer?.defineValidation) {
       renderer.defineValidation(ajv);
     }
   }
@@ -147,6 +148,14 @@ export function createForm(options: InitFormOptions = {}): Form {
     },
 
     // Validation
+    isRequired: (path: string, parentSchema?: FormJsonSchema) => {
+      const schema = parentSchema ?? store.getState().schema;
+      const fieldName = path.split(".").at(-1);
+      if (!fieldName) {
+        return false;
+      }
+      return schema.required?.includes(fieldName) ?? false;
+    },
     validate: () => {
       const _validate = () => {
         const validate = ajv.compile(store.getState().schema);

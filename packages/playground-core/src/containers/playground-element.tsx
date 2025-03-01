@@ -1,10 +1,11 @@
 import React from "react";
-import { createRoot, Root } from "react-dom/client";
-import { Form } from "@phalleux/jsf-core";
+import { createRoot, type Root } from "react-dom/client";
+
+import type { Form } from "@phalleux/jsf-core";
 
 import { examples } from "../examples";
 import css from "../index.css?inline";
-import { SchemaExampleCategory } from "../types/examples.ts";
+import type { SchemaExampleCategory } from "../types/examples.ts";
 
 import { Playground } from "./Playground.tsx";
 

@@ -1,11 +1,12 @@
-import { AnySchemaValue } from "@phalleux/jsf-schema-utils";
-import { ErrorObject } from "ajv";
-import { RefResolver } from "json-schema-ref-resolver";
+import type { ErrorObject } from "ajv";
+import type { RefResolver } from "json-schema-ref-resolver";
 
-import { Register } from "./register.ts";
-import { RendererType, SchemaRenderer } from "./renderer.ts";
-import { FormJsonSchema } from "./schema.ts";
-import { StoreApi, StoreUpdater } from "./store.ts";
+import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
+
+import type { Register } from "./register.ts";
+import type { RendererType, SchemaRenderer } from "./renderer.ts";
+import type { FormJsonSchema } from "./schema.ts";
+import type { StoreApi, StoreUpdater } from "./store.ts";
 
 /**
  * {@link FormState}
@@ -83,6 +84,7 @@ export interface Form extends FormCoreApi {
   getRefSchema: (path: string) => FormJsonSchema | null;
 
   // Validation
+  isRequired: (path: string, parentSchema?: FormJsonSchema) => boolean;
   validate: () => true | ErrorObject[];
   getFieldErrors: (path: string) => ErrorObject[];
 

@@ -1,4 +1,4 @@
-import { NonBooleanBaseJsonSchema } from "./schema.ts";
+import type { NonBooleanBaseJsonSchema } from "./schema.ts";
 
 /**
  * {@link SchemaTester}

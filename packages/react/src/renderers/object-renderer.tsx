@@ -1,4 +1,4 @@
-import { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
+import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
 import { isBooleanStartSchema, Tester } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema } from "../adapter";
@@ -31,6 +31,7 @@ export const objectRenderer: SchemaRenderer = {
           schema={property}
           path={`${path}.${key}`}
           {...props}
+          parentSchema={schema}
         />
       );
     });

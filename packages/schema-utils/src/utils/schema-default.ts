@@ -1,6 +1,6 @@
 import { RefResolver } from "json-schema-ref-resolver";
 
-import {
+import type {
   AnySchemaValue,
   BaseJsonSchema,
   NonBooleanBaseJsonSchema,

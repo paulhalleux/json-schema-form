@@ -1,7 +1,11 @@
 {
-  "files": [],
+  "extends": "@total-typescript/tsconfig/bundler/dom",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+  },
   "references": [
-    { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "include": ["src"]
 }

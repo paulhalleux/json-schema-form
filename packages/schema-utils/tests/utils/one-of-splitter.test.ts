@@ -1,4 +1,5 @@
-import { BaseJsonSchema, OneOfSplitter } from "../../src";
+import type { BaseJsonSchema } from "../../src";
+import { OneOfSplitter } from "../../src";
 
 describe("oneOfSplitter", () => {
   it("should split schema with only oneOf", () => {

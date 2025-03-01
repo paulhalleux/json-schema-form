@@ -1,8 +1,9 @@
-import { SchemaTester } from "@phalleux/jsf-schema-utils";
-import Ajv from "ajv";
+import type { Ajv } from "ajv";
 
-import { Register } from "./register.ts";
-import { FormJsonSchema } from "./schema.ts";
+import type { SchemaTester } from "@phalleux/jsf-schema-utils";
+
+import type { Register } from "./register.ts";
+import type { FormJsonSchema } from "./schema.ts";
 
 /**
  * Base renderer props

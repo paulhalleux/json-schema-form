@@ -6,6 +6,7 @@ type FieldProps = React.InputHTMLAttributes<HTMLDivElement> & {
   help?: string;
   error?: string;
   id?: string;
+  required?: boolean;
 };
 
 export function Field({
@@ -15,13 +16,17 @@ export function Field({
   error,
   children,
   id,
+  required,
   ...props
 }: FieldProps) {
   return (
-    <div className={clsx("flex flex-col space-y-1", className)} {...props}>
+    <div
+      className={clsx("flex flex-col space-y-1 w-full", className)}
+      {...props}
+    >
       {label && (
         <label htmlFor={id} className={"text-sm font-medium text-neutral-700"}>
-          {label}
+          {label} {required && <span className="text-red-700">*</span>}
         </label>
       )}
       {children}

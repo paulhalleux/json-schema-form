@@ -1,5 +1,5 @@
-import { BaseJsonSchema } from "../types/schema.ts";
-import { SchemaTester } from "../types/tester.ts";
+import type { BaseJsonSchema } from "../types/schema.ts";
+import type { SchemaTester } from "../types/tester.ts";
 
 /**
  * Test if the schema is a boolean schema

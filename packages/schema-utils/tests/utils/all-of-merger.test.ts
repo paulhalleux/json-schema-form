@@ -1,4 +1,5 @@
-import { AllOfMerger, BaseJsonSchema } from "../../src";
+import type { BaseJsonSchema } from "../../src";
+import { AllOfMerger } from "../../src";
 
 describe("allOfMerger", () => {
   it("should merge schemas with only allOf", () => {

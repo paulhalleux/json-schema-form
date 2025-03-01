@@ -1,9 +1,12 @@
 import { memo, useCallback } from "react";
-import { useNavigate } from "react-router";
 import { clsx } from "clsx";
 import { ArrowRightIcon, BoxesIcon } from "lucide-react";
+import { useNavigate } from "react-router";
 
-import { SchemaExample, SchemaExampleCategory } from "../types/examples.ts";
+import type {
+  SchemaExample,
+  SchemaExampleCategory,
+} from "../types/examples.ts";
 
 import { Collapsible } from "./Collapsible.tsx";
 import { NavButton } from "./NavButton.tsx";

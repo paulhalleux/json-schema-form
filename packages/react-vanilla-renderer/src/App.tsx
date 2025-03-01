@@ -1,8 +1,7 @@
 import React from "react";
-import {
-  createPlaygroundElement,
-  PlaygroundHTMLElement,
-} from "@phalleux/jsf-playground-core";
+
+import type { PlaygroundHTMLElement } from "@phalleux/jsf-playground-core";
+import { createPlaygroundElement } from "@phalleux/jsf-playground-core";
 import { Form, useForm } from "@phalleux/jsf-react";
 
 import { reactVanillaRenderers } from "./renderers";

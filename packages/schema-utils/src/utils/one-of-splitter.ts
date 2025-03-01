@@ -1,6 +1,6 @@
 import { merge, omit } from "lodash";
 
-import { BaseJsonSchema } from "../types/schema.ts";
+import type { BaseJsonSchema } from "../types/schema.ts";
 
 import { isBooleanStartSchema } from "./testers.ts";
 

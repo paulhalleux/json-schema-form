@@ -1,8 +1,3 @@
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
-import js from "@eslint/js";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
@@ -10,6 +5,12 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
+import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,19 +85,25 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "prettier/prettier": "error",
       "no-use-before-define": "off",
+      "import/newline-after-import": "error",
       "simple-import-sort/imports": [
         "error",
         {
           groups: [
-            [
-              "^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)",
-            ],
-            ["^react", "^@?\\w"],
-            ["^(@|@company|@ui|components|utils|config|vendored-lib)(/.*|$)"],
-            ["^\\u0000"],
+            // `react` first, `next` second, then packages starting with a character
+            ["^react$", "^next", "^[a-z]"],
+            // Packages starting with `@`
+            ["^@"],
+            // Packages starting with `~`
+            ["^~"],
+            // Imports starting with `../`
             ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+            // Imports starting with `./`
             ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+            // Style imports
             ["^.+\\.s?css$"],
+            // Side effect imports
+            ["^\\u0000"],
           ],
         },
       ],

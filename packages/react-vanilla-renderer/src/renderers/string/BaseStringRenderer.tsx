@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { BaseRendererProps } from "@phalleux/jsf-core";
+
+import type { BaseRendererProps } from "@phalleux/jsf-core";
 import { useField } from "@phalleux/jsf-react";
 
 import { Field, Input } from "../../components";
@@ -15,11 +16,14 @@ export type BaseStringRendererProps = BaseRendererProps & {
 export function BaseStringRenderer({
   schema,
   path,
+  parentSchema,
   ...fieldProps
 }: BaseStringRendererProps) {
   const { regex, min, max, type, step } = fieldProps;
-  const { value, setValue, id, error } = useField<string>({
+  const { value, setValue, id, error, required } = useField<string>({
     path,
+    parentSchema,
+    schema,
   });
 
   const onInputChange = useCallback(
@@ -31,7 +35,13 @@ export function BaseStringRenderer({
   );
 
   return (
-    <Field id={id} label={schema.title} help={schema.$comment} error={error}>
+    <Field
+      id={id}
+      label={schema.title}
+      help={schema.$comment}
+      error={error}
+      required={required}
+    >
       <Input
         type={type}
         name={id}
@@ -46,6 +56,7 @@ export function BaseStringRenderer({
         maxLength={typeof max === "number" ? max : undefined}
         error={!!error}
         step={step}
+        required={required}
       />
     </Field>
   );

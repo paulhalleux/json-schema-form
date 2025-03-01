@@ -1,7 +1,7 @@
 import { produce } from "immer";
 
-import { FormState, FormStore } from "../types/core.ts";
-import { StoreUpdater } from "../types/store.ts";
+import type { FormState, FormStore } from "../types/core.ts";
+import type { StoreUpdater } from "../types/store.ts";
 
 /**
  * Create a new form store using default API

@@ -1,4 +1,4 @@
-import { SchemaExampleCategory } from "../types/examples.ts";
+import type { SchemaExampleCategory } from "../types/examples.ts";
 
 export const ObjectExamples: SchemaExampleCategory = {
   id: "object",

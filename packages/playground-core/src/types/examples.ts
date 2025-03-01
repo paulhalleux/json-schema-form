@@ -1,4 +1,4 @@
-import { FormJsonSchema } from "@phalleux/jsf-core";
+import type { FormJsonSchema } from "@phalleux/jsf-core";
 
 export type SchemaExample = {
   id: string;

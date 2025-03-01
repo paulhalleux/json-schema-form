@@ -1,8 +1,9 @@
 import { useState } from "react";
+
 import { createForm } from "@phalleux/jsf-core";
 
 import { Playground } from "../containers";
-import { SchemaExampleCategory } from "../types/examples.ts";
+import type { SchemaExampleCategory } from "../types/examples.ts";
 
 const examples: SchemaExampleCategory[] = Array.from(
   { length: 10 },

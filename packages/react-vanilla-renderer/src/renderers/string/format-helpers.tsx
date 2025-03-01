@@ -1,14 +1,12 @@
-import {
+import type {
   BaseRendererProps,
   FormJsonSchema,
   SchemaRenderer,
 } from "@phalleux/jsf-core";
 import { Tester } from "@phalleux/jsf-schema-utils";
 
-import {
-  BaseStringRenderer,
-  BaseStringRendererProps,
-} from "./BaseStringRenderer.tsx";
+import type { BaseStringRendererProps } from "./BaseStringRenderer.tsx";
+import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
 
 /**
  * Create a renderer for a specific format

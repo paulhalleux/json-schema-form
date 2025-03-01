@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
+import { isEqual } from "lodash";
+import { create } from "zustand/react";
+import { useShallow } from "zustand/react/shallow";
+
+import type {
   BaseRendererProps,
-  createForm,
-  type Form,
+  Form,
   FormState,
   FormStore,
   InitFormOptions,
 } from "@phalleux/jsf-core";
-import { isEqual } from "lodash";
-import { create } from "zustand/react";
-import { useShallow } from "zustand/react/shallow";
+import { createForm } from "@phalleux/jsf-core";
 
 import { allOfRenderer } from "../renderers/all-of-renderer.tsx";
 import { objectRenderer } from "../renderers/object-renderer.tsx";

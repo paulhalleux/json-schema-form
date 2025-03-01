@@ -1,4 +1,5 @@
 import { memo } from "react";
+
 import { javascript } from "@codemirror/lang-javascript";
 import { vscodeLightInit } from "@uiw/codemirror-theme-vscode/src/light.ts";
 import ReactCodeMirror from "@uiw/react-codemirror";

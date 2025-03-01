@@ -1,6 +1,7 @@
 import { RefResolver } from "json-schema-ref-resolver";
 
-import { BaseJsonSchema, SchemaDefault, SchemaDefaultMode } from "../../src";
+import type { BaseJsonSchema } from "../../src";
+import { SchemaDefault, SchemaDefaultMode } from "../../src";
 
 describe("default", () => {
   describe("object", () => {

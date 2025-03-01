@@ -1,4 +1,4 @@
-import { SchemaRenderer } from "@phalleux/jsf-core";
+import type { SchemaRenderer } from "@phalleux/jsf-core";
 import { Tester } from "@phalleux/jsf-schema-utils";
 
 import { BaseNumberRenderer } from "./BaseNumberRenderer.tsx";

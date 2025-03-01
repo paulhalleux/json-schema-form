@@ -1,4 +1,4 @@
-import { ErrorObject } from "ajv";
+import type { ErrorObject } from "ajv";
 
 /**
  * Get the path of the value that caused the error

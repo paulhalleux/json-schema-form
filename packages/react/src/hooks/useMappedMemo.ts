@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 /**
  * Custom hook that memoizes mapped values while keeping unchanged ones.
@@ -17,13 +17,6 @@ export function useMappedMemo<T, U>(
   const previousMapRef = React.useRef(
     new Map<string | number, { value: U; index: number }>(),
   );
-
-  useEffect(() => {
-    previousMapRef.current = new Map<
-      string | number,
-      { value: U; index: number }
-    >();
-  }, [items]);
 
   return React.useMemo(() => {
     const newMap = new Map<string | number, { value: U; index: number }>();

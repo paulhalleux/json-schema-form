@@ -1,4 +1,5 @@
 @import "@phalleux/jsf-tailwind-config";
+@import "@phalleux/jsf-react/dist/jsf-react.css";
 
 .cm-theme,
 .cm-editor {

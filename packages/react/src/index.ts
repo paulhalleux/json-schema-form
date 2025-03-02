@@ -4,6 +4,8 @@ import type { StoreApi } from "zustand/vanilla";
 
 import type { BaseRendererProps, FormState } from "@phalleux/jsf-core";
 
+import "./index.css";
+
 declare module "@phalleux/jsf-core" {
   export interface Register {
     store: UseBoundStore<StoreApi<FormState>>;
@@ -12,6 +14,7 @@ declare module "@phalleux/jsf-core" {
 }
 
 export * from "./adapter";
+export * from "./components";
 export * from "./hooks/useField.ts";
 export * from "./hooks/useArrayField.ts";
 export * from "./hooks/useKeyedArray.ts";

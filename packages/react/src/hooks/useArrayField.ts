@@ -26,7 +26,7 @@ export function useArrayField<T extends AnySchemaValue>({
     return Array.isArray(value) ? value : [];
   });
 
-  const [keyedItems, { push: _push, remove: _remove, reorder }] =
+  const [keyedItems, { push: _push, remove: _remove, reorder: _reorder }] =
     useKeyedArray<T>(items, [schema]);
 
   const arrayItems = useMappedMemo(
@@ -76,6 +76,23 @@ export function useArrayField<T extends AnySchemaValue>({
       });
     },
     [_remove, setValue],
+  );
+
+  const reorder = React.useCallback(
+    (fromIndex: number, toIndex: number) => {
+      _reorder(fromIndex, toIndex);
+      setValue((value) => {
+        if (value) {
+          const copy = [...value];
+          const [removed] = copy.splice(fromIndex, 1);
+          if (!removed) return value;
+          copy.splice(toIndex, 0, removed);
+          return copy;
+        }
+        return value ?? [];
+      });
+    },
+    [_reorder, setValue],
   );
 
   return {

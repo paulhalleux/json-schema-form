@@ -13,6 +13,7 @@ import type {
 import { createForm } from "@phalleux/jsf-core";
 
 import { allOfRenderer } from "../renderers/all-of-renderer.tsx";
+import { debugRenderer } from "../renderers/debug-renderer.tsx";
 import { objectRenderer } from "../renderers/object-renderer.tsx";
 import { refRenderer } from "../renderers/ref-renderer.tsx";
 
@@ -20,7 +21,12 @@ export const createZustandStore = (initialState: FormState): FormStore => {
   return create(() => initialState);
 };
 
-const BUILT_IN_RENDERERS = [allOfRenderer, refRenderer, objectRenderer];
+const BUILT_IN_RENDERERS = [
+  allOfRenderer,
+  refRenderer,
+  objectRenderer,
+  debugRenderer,
+];
 
 export function useForm(options: InitFormOptions = {}) {
   const [form] = useState(() =>
@@ -68,18 +74,18 @@ export const RenderSchema = ({
   previousRenderers,
 }: BaseRendererProps) => {
   const instance = useFormInstance();
-  const Renderer = useMemo(() => {
+  const renderer = useMemo(() => {
     return instance.getRenderer(schema, previousRenderers);
   }, [instance, previousRenderers, schema]);
 
-  if (!Renderer) return "No renderer found";
+  if (!renderer) return "No renderer found";
 
   return (
-    <Renderer
+    <renderer.renderer
       schema={schema}
       path={path}
       parentSchema={parentSchema}
-      previousRenderers={previousRenderers}
+      previousRenderers={[...previousRenderers, renderer.id]}
     />
   );
 };
@@ -94,7 +100,7 @@ export function Form({ form, children, ...rest }: FormProps) {
       <form {...rest}>
         <RenderSchema
           schema={schema}
-          path=""
+          path={form.getFieldPath(undefined)}
           parentSchema={undefined}
           previousRenderers={[]}
         />

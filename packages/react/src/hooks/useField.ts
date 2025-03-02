@@ -35,7 +35,7 @@ export function useField<T extends AnySchemaValue>({
   return {
     value,
     setValue,
-    id: path === "" ? "#" : path,
+    id: path === "" ? "root" : path,
     error: errors[0]?.message,
     required,
   };

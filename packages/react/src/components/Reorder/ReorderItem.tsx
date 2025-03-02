@@ -38,7 +38,7 @@ export function ReorderItem<Element extends React.ElementType = "li">({
 }: ReorderItemProps<Element>) {
   const Component = as || "ul";
 
-  const id = React.useContext(ReorderContext);
+  const { id, disabled } = React.useContext(ReorderContext) ?? {};
 
   const ref = React.useRef<HTMLElement>(null);
   const handleRef = React.useRef<HTMLElement>(null);
@@ -53,6 +53,7 @@ export function ReorderItem<Element extends React.ElementType = "li">({
       draggable({
         element,
         dragHandle: handleRef.current ?? undefined,
+        canDrag: () => !disabled,
         getInitialData() {
           return attachReorderId({ index }, id);
         },
@@ -107,7 +108,7 @@ export function ReorderItem<Element extends React.ElementType = "li">({
         },
       }),
     );
-  }, [id, index]);
+  }, [disabled, id, index]);
 
   return (
     <ReorderStateContext value={useMemo(() => ({ state, handleRef }), [state])}>

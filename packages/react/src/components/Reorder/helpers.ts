@@ -3,7 +3,15 @@ import React from "react";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 
 const reorderIdSymbol = Symbol("reorder-id");
-export const ReorderContext = React.createContext<string | null>(null);
+
+type ReorderContextType = {
+  id: string;
+  disabled: boolean;
+};
+
+export const ReorderContext = React.createContext<ReorderContextType | null>(
+  null,
+);
 
 export function attachReorderId<T extends Record<string, any>>(
   data: T,

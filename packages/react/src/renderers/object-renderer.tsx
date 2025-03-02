@@ -1,7 +1,7 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
 import { isBooleanStartSchema, Tester } from "@phalleux/jsf-schema-utils";
 
-import { RenderSchema } from "../adapter";
+import { RenderSchema, useFormInstance } from "../adapter";
 
 const objectTester = Tester((builder) => {
   builder.withType("object");
@@ -16,6 +16,8 @@ export const objectRenderer: SchemaRenderer = {
     path,
     ...props
   }: BaseRendererProps) {
+    const instance = useFormInstance();
+
     if (!schema.properties) {
       return null;
     }
@@ -29,8 +31,9 @@ export const objectRenderer: SchemaRenderer = {
         <RenderSchema
           key={key}
           schema={property}
-          path={`${path}.${key}`}
+          path={instance.getFieldPath(path, key)}
           {...props}
+          previousRenderers={[]}
           parentSchema={schema}
         />
       );

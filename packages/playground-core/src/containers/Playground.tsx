@@ -1,4 +1,4 @@
-import {
+import React, {
   memo,
   type PropsWithChildren,
   useEffect,
@@ -11,6 +11,7 @@ import { BrowserRouter } from "react-router-dom";
 import type { Form, FormState } from "@phalleux/jsf-core";
 
 import { Code, PlaygroundSection, Sidebar } from "../components";
+import { CheckedInput } from "../components/CheckedInput.tsx";
 import type {
   SchemaExample,
   SchemaExampleCategory,
@@ -23,10 +24,14 @@ type PlaygroundProps = PropsWithChildren<{
 }>;
 
 export const PlaygroundLayout = memo(function PlaygroundLayout({
+  form,
   examples,
   name,
 }: PlaygroundProps) {
   const { activeExampleId } = useParams<{ activeExampleId: string }>();
+
+  const debug = useFormStore(form, (_, form) => form.getFlag("debug") ?? false);
+
   return (
     <div className="app h-screen w-screen flex text-neutral-800">
       <Sidebar
@@ -34,8 +39,17 @@ export const PlaygroundLayout = memo(function PlaygroundLayout({
         examples={examples}
         activeExampleId={activeExampleId}
       />
-      <div className="p-4 bg-neutral-100 grow grid grid-cols-4 grid-rows-2 gap-2">
-        <Outlet />
+      <div className="flex flex-col w-full">
+        <div className="px-4 flex items-center bg-white border-b border-neutral-300 h-12 shrink-0">
+          <CheckedInput
+            value={debug}
+            onChange={(value) => form.setFlag("debug", value)}
+            label="Debug"
+          />
+        </div>
+        <div className="p-4 bg-neutral-100 grow grid grid-cols-4 grid-rows-2 gap-2 min-h-0">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
@@ -182,10 +196,13 @@ const find = (
   return null;
 };
 
-const useFormStore = <S,>(form: Form, selector: (state: FormState) => S) => {
+const useFormStore = <S,>(
+  form: Form,
+  selector: (state: FormState, form: Form) => S,
+) => {
   return useSyncExternalStore(
     form.store.subscribe,
-    () => selector(form.store.getState()),
-    () => selector(form.store.getState()),
+    () => selector(form.store.getState(), form),
+    () => selector(form.store.getState(), form),
   );
 };

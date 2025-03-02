@@ -1,9 +1,12 @@
 import React from "react";
 
 import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
-import { SchemaDefault } from "@phalleux/jsf-schema-utils/src";
+import {
+  SchemaDefault,
+  SchemaDefaultMode,
+} from "@phalleux/jsf-schema-utils/src";
 
-import { useStore } from "../adapter";
+import { useFormInstance, useStore } from "../adapter";
 
 import { type UseFieldArgs } from "./useField.ts";
 import { useKeyedArray } from "./useKeyedArray.ts";
@@ -19,6 +22,7 @@ export function useArrayField<T extends AnySchemaValue>({
   path,
   schema,
 }: Pick<UseFieldArgs, "path" | "schema">) {
+  const instance = useFormInstance();
   const { setValue } = useSetValue<T[]>({ path });
 
   const items = useStore((_, form) => {
@@ -36,7 +40,7 @@ export function useArrayField<T extends AnySchemaValue>({
       return {
         key: item.key,
         value: item.item,
-        path: `${path}[${index}]`,
+        path: instance.getFieldPath(path, `${index}`),
         schema: Array.isArray(schema.items)
           ? schema.items[index % schema.items.length]
           : schema.items,
@@ -54,14 +58,19 @@ export function useArrayField<T extends AnySchemaValue>({
         : schema.items;
 
       const defaultItem = (
-        nextSchema ? (SchemaDefault.get(nextSchema) ?? null) : null
+        nextSchema
+          ? (SchemaDefault.get(nextSchema, {
+              refResolver: instance.store.getState().refResolver,
+              mode: SchemaDefaultMode.TypeDefault,
+            }) ?? null)
+          : null
       ) as T;
 
       return [...(value ?? []), defaultItem];
     });
 
     return addedKey;
-  }, [_push, schema.items, setValue]);
+  }, [_push, instance.store, schema.items, setValue]);
 
   const remove = React.useCallback(
     (index: number) => {

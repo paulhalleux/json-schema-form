@@ -4,7 +4,7 @@ import type { RefResolver } from "json-schema-ref-resolver";
 import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
 
 import type { Register } from "./register.ts";
-import type { RendererType, SchemaRenderer } from "./renderer.ts";
+import type { SchemaRenderer } from "./renderer.ts";
 import type { FormJsonSchema } from "./schema.ts";
 import type { StoreApi, StoreUpdater } from "./store.ts";
 
@@ -18,6 +18,8 @@ export interface FormState {
   schema: FormJsonSchema;
   value: AnySchemaValue;
   errors: ErrorObject[] | null;
+  flags: Map<string, boolean>;
+  renderers: SchemaRenderer[];
 }
 
 /**
@@ -82,6 +84,7 @@ export interface Form extends FormCoreApi {
   getSchema: () => FormJsonSchema;
   setSchema: (schema: FormJsonSchema) => void;
   getRefSchema: (path: string) => FormJsonSchema | null;
+  getFieldPath: (parentPath: string | undefined, key?: string) => string;
 
   // Validation
   isRequired: (path: string, parentSchema?: FormJsonSchema) => boolean;
@@ -92,7 +95,15 @@ export interface Form extends FormCoreApi {
   getRenderer: (
     schema: FormJsonSchema,
     previousRenderers: string[],
-  ) => RendererType | null;
+  ) => SchemaRenderer | null;
+  setRenderers: (renderers: SchemaRenderer[]) => void;
+  addRenderer: (renderer: SchemaRenderer) => void;
+  removeRenderer: (id: string) => void;
+  hasRenderer: (id: string) => boolean;
+
+  // Flags
+  setFlag: (flag: string, value: boolean) => void;
+  getFlag: (flag: string) => boolean;
 }
 
 export type FormStoreFactory = (initialState: FormState) => FormStore;

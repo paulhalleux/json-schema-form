@@ -32,5 +32,15 @@ export const ArrayExamples: SchemaExampleCategory = {
         },
       },
     },
+    {
+      id: "array-multi-items",
+      title: "Multiple Items",
+      schema: {
+        type: "array",
+        title: "Multiple Items",
+        description: "This is an array with multiple items",
+        items: [{ type: "string" }, { type: "number" }],
+      },
+    },
   ],
 };

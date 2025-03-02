@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -13,6 +13,7 @@ import { ReorderItem } from "./ReorderItem.tsx";
 
 type ReorderProps<Element extends React.ElementType> = React.PropsWithChildren<{
   onReorder?: (fromIndex: number, toIndex: number) => void;
+  disabled?: boolean;
 }> &
   PolymorphicProps<Element>;
 
@@ -20,6 +21,7 @@ export function Reorder<Element extends React.ElementType = "ul">({
   children,
   onReorder,
   as,
+  disabled = false,
   ...props
 }: ReorderProps<Element>) {
   const Component = as || "ul";
@@ -62,7 +64,7 @@ export function Reorder<Element extends React.ElementType = "ul">({
   }, [id]);
 
   return (
-    <ReorderContext value={id}>
+    <ReorderContext value={useMemo(() => ({ id, disabled }), [id, disabled])}>
       <Component {...props}>{children}</Component>
     </ReorderContext>
   );

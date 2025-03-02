@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { isEqual } from "lodash";
 
 import type { BaseRendererProps } from "@phalleux/jsf-core";
 import { useArrayField } from "@phalleux/jsf-react";
@@ -18,6 +19,11 @@ export const ArrayRenderer = memo(function ArrayRenderer({
   });
 
   const [selectedItemKey, setSelectedItemKey] = useState(value[0]?.key);
+  const latestValue = useRef(value);
+  if (!isEqual(latestValue.current, value)) {
+    latestValue.current = value;
+  }
+
   const selectedItem = useMemo(() => {
     return value.find((item) => item.key === selectedItemKey);
   }, [selectedItemKey, value]);
@@ -30,25 +36,32 @@ export const ArrayRenderer = memo(function ArrayRenderer({
   const deleteItem = useCallback(
     (index: number) => {
       remove(index);
-      if (value[index]?.key === selectedItemKey)
-        setSelectedItemKey(value[index - 1]?.key ?? value[index + 1]?.key);
+      setSelectedItemKey((prev) => {
+        if (latestValue.current[index]?.key === prev)
+          return (
+            latestValue.current[index - 1]?.key ??
+            latestValue.current[index + 1]?.key
+          );
+        return prev;
+      });
     },
-    [remove, selectedItemKey, value],
+    [remove],
   );
 
   return (
     <div className="space-y-2 w-full">
       <SchemaHeader title={schema.title} description={schema.description} />
-      <div className="flex gap-2">
+      <div className="flex gap-2 max-h-72">
         <ArrayItemsNav
           value={value}
           addItem={addItem}
           deleteItem={deleteItem}
           reorderItem={reorder}
+          enableReorder={!Array.isArray(schema.items)}
           setSelectedItemKey={setSelectedItemKey}
           selectedItemKey={selectedItemKey}
         />
-        <div className="flex flex-col p-2 border border-gray-300 rounded-sm w-full">
+        <div className="flex flex-col p-2 border border-gray-300 rounded-sm w-full overflow-y-auto">
           {selectedItem ? (
             <ArrayItemRenderer
               key={selectedItem.key}

@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import addFormats, { type FormatName } from "ajv-formats";
 import { formatNames } from "ajv-formats/dist/formats";
-import { castDraft } from "immer";
+import { castDraft, enableMapSet } from "immer";
 import { RefResolver } from "json-schema-ref-resolver";
 import { get, merge, set } from "lodash";
 
@@ -18,8 +18,11 @@ import type {
   FormState,
   InitFormOptions,
 } from "../types/core.ts";
+import type { SchemaRenderer } from "../types/renderer.ts";
 import type { FormJsonSchema } from "../types/schema.ts";
-import { getValuePath } from "../utils/error.ts";
+import { errorToJsonPath } from "../utils/error.ts";
+
+enableMapSet();
 
 const VALIDATED_FORMATS: FormatName[] = formatNames.filter(
   (format) => format !== "time" && format !== "date-time",
@@ -30,6 +33,8 @@ const DEFAULT_STATE: FormState = {
   schema: {},
   value: {},
   errors: null,
+  flags: new Map<string, boolean>(),
+  renderers: [],
 };
 
 const DEFAULT_OPTIONS: FormOptions = {
@@ -54,19 +59,10 @@ export function createForm(options: InitFormOptions = {}): Form {
 
   addFormats(ajv, { formats: VALIDATED_FORMATS, keywords: true });
 
-  const sortedRenderers = (resolvedOptions.renderers ?? [])?.sort(
-    (a, b) => (b.priority ?? 0) - (a.priority ?? 0),
-  );
+  const state = merge({}, DEFAULT_STATE, {
+    renderers: sortRenderers(resolvedOptions.renderers ?? []),
+  });
 
-  // Define validation for all renderers
-  for (const sortedRenderersKey in sortedRenderers) {
-    const renderer = sortedRenderers[sortedRenderersKey];
-    if (renderer?.defineValidation) {
-      renderer.defineValidation(ajv);
-    }
-  }
-
-  const state = merge({}, DEFAULT_STATE);
   const store = resolvedOptions.createStore(state);
   const storeUpdater = createStoreUpdater(store);
 
@@ -107,23 +103,23 @@ export function createForm(options: InitFormOptions = {}): Form {
 
     // Field value management
     getFieldValue: (path: string) => {
-      const sanitizedPath = path.startsWith(".") ? path.slice(1) : path;
-      if (sanitizedPath === "") {
+      const pathArray = path.split("/").filter((p) => p !== "");
+      if (pathArray.length === 0) {
         return store.getState().value;
       }
-      return get(store.getState().value, sanitizedPath) ?? null;
+      return get(store.getState().value, pathArray) ?? null;
     },
     setFieldValue: (path, value) => {
-      const sanitizedPath = path.startsWith(".") ? path.slice(1) : path;
+      const pathArray = path.split("/").filter((p) => p !== "");
       storeUpdater((state) => {
-        if (sanitizedPath === "") {
+        if (pathArray.length === 0) {
           state.value = value;
         } else if (
           typeof state.value === "object" ||
           typeof state.value === "undefined" ||
           state.value === null
         ) {
-          state.value = set(state.value ?? {}, sanitizedPath, value);
+          state.value = set(state.value ?? {}, pathArray, value);
         }
       });
     },
@@ -138,13 +134,52 @@ export function createForm(options: InitFormOptions = {}): Form {
       }
       return null;
     },
+    getFieldPath: (parentPath, key) => {
+      if (parentPath === undefined) {
+        return "";
+      }
+
+      if (key === undefined) {
+        return parentPath;
+      }
+
+      return `${parentPath}/${key}`;
+    },
 
     // Rendering
     getRenderer: (schema, previousRenderers) => {
-      const renderer = sortedRenderers
+      const { renderers } = store.getState();
+      const renderer = renderers
         .filter((renderer) => !previousRenderers.includes(renderer.id))
         .find((renderer) => renderer.tester(schema));
-      return renderer?.renderer ?? null;
+      return renderer ?? null;
+    },
+    setRenderers: (renderers) => {
+      storeUpdater((state) => {
+        state.renderers = sortRenderers(renderers);
+      });
+    },
+    addRenderer: (renderer) => {
+      storeUpdater((state) => {
+        state.renderers.push(renderer);
+        state.renderers = sortRenderers(state.renderers);
+      });
+
+      if (renderer?.defineValidation) {
+        // TODO: clean validation on renderer removal
+        renderer.defineValidation(ajv);
+      }
+    },
+    removeRenderer: (id) => {
+      storeUpdater((state) => {
+        state.renderers = state.renderers.filter(
+          (renderer) => renderer.id !== id,
+        );
+        state.renderers = sortRenderers(state.renderers);
+      });
+    },
+    hasRenderer: (id) => {
+      return store.getState().renderers.some((renderer) => renderer.id === id);
     },
 
     // Validation
@@ -183,7 +218,17 @@ export function createForm(options: InitFormOptions = {}): Form {
       if (path === "") {
         return errors;
       }
-      return errors.filter((error) => getValuePath(error) === path);
+      return errors.filter((error) => errorToJsonPath(error) === path);
+    },
+
+    // Flags
+    getFlag: (key: string) => {
+      return store.getState().flags.get(key) ?? false;
+    },
+    setFlag: (key: string, value: boolean) => {
+      storeUpdater((state) => {
+        state.flags.set(key, value);
+      });
     },
   };
 }
@@ -217,4 +262,8 @@ const createRefResolver = (
   }
 
   return refResolver;
+};
+
+const sortRenderers = (renderers: SchemaRenderer[]) => {
+  return renderers.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 };

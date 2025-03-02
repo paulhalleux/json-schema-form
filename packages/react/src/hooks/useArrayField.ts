@@ -85,8 +85,8 @@ export function useArrayField<T extends AnySchemaValue>({
         if (value) {
           const copy = [...value];
           const [removed] = copy.splice(fromIndex, 1);
-          if (!removed) return value;
-          copy.splice(toIndex, 0, removed);
+          // Forcing non-null value as it can be null or undefined
+          copy.splice(toIndex, 0, removed!);
           return copy;
         }
         return value ?? [];

@@ -1,4 +1,4 @@
-import type { SchemaTester } from "../types/tester.ts";
+import type { SchemaTester } from "../types";
 
 /**
  * Builder for a schema tester

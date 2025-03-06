@@ -13,6 +13,7 @@ import type {
 import { createForm } from "@phalleux/jsf-core";
 
 import { allOfRenderer } from "../renderers/all-of-renderer.tsx";
+import { conditionRenderer } from "../renderers/condition-renderer.tsx";
 import { debugRenderer } from "../renderers/debug-renderer.tsx";
 import { objectRenderer } from "../renderers/object-renderer.tsx";
 import { refRenderer } from "../renderers/ref-renderer.tsx";
@@ -26,6 +27,7 @@ const BUILT_IN_RENDERERS = [
   refRenderer,
   objectRenderer,
   debugRenderer,
+  conditionRenderer,
 ];
 
 export function useForm(options: InitFormOptions = {}) {

@@ -1,3 +1,4 @@
+import Ajv2020 from "ajv/dist/2020";
 import { merge, omit } from "lodash";
 
 import type { JsonSchema, ObjectSchema } from "./types";
@@ -74,6 +75,18 @@ export class Schema<T extends JsonSchema = JsonSchema> {
   }
 
   /**
+   * Validates the data against the schema.
+   * @param {unknown} data - The data to validate.
+   * @returns {boolean} `true` if the data is valid, otherwise `false`.
+   */
+  validate(data: unknown): boolean {
+    const ajv = new Ajv2020();
+    const validate = ajv.compile(this.schema);
+    validate(data);
+    return !validate.errors?.length;
+  }
+
+  /**
    * Returns the dereferenced JSON schema object.
    * @returns {JsonSchema} The dereferenced JSON schema object.
    */
@@ -131,7 +144,7 @@ export class Schema<T extends JsonSchema = JsonSchema> {
    * Similar to `toDereferencedJSON` but resolves nested $ref in properties and items by getting the sub-schema.
    * This also merges the allOf properties.
    */
-  toDeepDereferencedJSON(): JsonSchema {
+  toDeepResolvedJSON(): JsonSchema {
     const dereferenced = this.toMerged().toDereferenced();
     const clone = merge({}, dereferenced.toJSON());
 
@@ -144,23 +157,23 @@ export class Schema<T extends JsonSchema = JsonSchema> {
         clone.properties[key] = dereferenced
           .getSubSchema(`#/properties/${key}`)
           .toMerged()
-          .toDeepDereferencedJSON();
+          .toDeepResolvedJSON();
       }
     }
 
     if (clone.items) {
       if (Array.isArray(clone.items)) {
-        clone.items = clone.items.map((item, index) => {
+        clone.items = clone.items.map((_, index) => {
           return dereferenced
             .getSubSchema(`#/items/${index}`)
             .toMerged()
-            .toDeepDereferencedJSON();
+            .toDeepResolvedJSON();
         }) as [JsonSchema, ...JsonSchema[]];
       } else {
         clone.items = dereferenced
           .getSubSchema("#/items")
           .toMerged()
-          .toDeepDereferencedJSON();
+          .toDeepResolvedJSON();
       }
     }
 
@@ -308,6 +321,29 @@ export class Schema<T extends JsonSchema = JsonSchema> {
     }
 
     return definitions;
+  }
+
+  public withAppliedCondition(value: unknown) {
+    if (typeof this.schema === "boolean") {
+      throw new Error("Cannot apply condition on a non-object schema");
+    }
+
+    const ifSchema = this.getSubSchema("#/if");
+    const valid = ifSchema.validate(value);
+
+    const finalSchema = valid
+      ? this.getSubSchema("#/then")
+      : this.getSubSchema("#/else");
+
+    return new Schema(
+      merge(
+        {},
+        omit(this.schema, ["if", "then", "else"]),
+        finalSchema.toJSON(),
+      ),
+      this.parent,
+      this.path,
+    );
   }
 
   public isObjectSchema(): this is Schema<ObjectSchema> {

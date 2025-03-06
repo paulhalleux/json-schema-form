@@ -86,7 +86,7 @@ const schemaSelector = (state: FormState) =>
 const schemaDerefSelector = (state: FormState) =>
   JSON.stringify(state.schema.toDereferenced().toMergedJSON(), null, 2);
 const schemaDeepDerefSelector = (state: FormState) =>
-  JSON.stringify(state.schema.toDeepDereferencedJSON(), null, 2);
+  JSON.stringify(state.schema.toDeepResolvedJSON(), null, 2);
 
 const PlaygroundPage = memo(function PlaygroundPage({
   form,

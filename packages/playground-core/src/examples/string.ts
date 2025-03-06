@@ -1,4 +1,4 @@
-import { formatNames } from "ajv-formats/dist/formats";
+import { formatNames } from "@phalleux/jsf-schema-utils";
 
 import type { SchemaExampleCategory } from "../types/examples.ts";
 
@@ -74,8 +74,6 @@ export const StringExamples: SchemaExampleCategory = {
               "date",
               "time",
               "date-time",
-              "iso-date-time",
-              "iso-time",
             ].includes(format),
         )
         .map((format) => ({
@@ -143,28 +141,6 @@ export const StringExamples: SchemaExampleCategory = {
             formatMaximum: "12:00:00",
           },
         },
-        {
-          id: "string-time-iso",
-          title: "ISO Time",
-          schema: {
-            type: "string",
-            title: "Time",
-            description: "A time string",
-            format: "iso-time",
-          },
-        },
-        {
-          id: "string-time-min-max-iso",
-          title: "ISO Time with min and max",
-          schema: {
-            type: "string",
-            title: "Time",
-            description: "A time string with min and max",
-            format: "iso-time",
-            formatMinimum: "00:00:00",
-            formatMaximum: "12:00:00",
-          },
-        },
       ],
     },
     {
@@ -189,28 +165,6 @@ export const StringExamples: SchemaExampleCategory = {
             title: "Date Time",
             description: "A date-time string with min and max",
             format: "date-time",
-            formatMinimum: "2020-01-01T00:00:00Z",
-            formatMaximum: "2021-01-01T12:00:00Z",
-          },
-        },
-        {
-          id: "string-date-time-iso",
-          title: "ISO Date Time",
-          schema: {
-            type: "string",
-            title: "Date Time",
-            description: "A date-time string",
-            format: "iso-date-time",
-          },
-        },
-        {
-          id: "string-date-time-min-max-iso",
-          title: "ISO Date Time with min and max",
-          schema: {
-            type: "string",
-            title: "Date Time",
-            description: "A date-time string with min and max",
-            format: "iso-date-time",
             formatMinimum: "2020-01-01T00:00:00Z",
             formatMaximum: "2021-01-01T12:00:00Z",
           },

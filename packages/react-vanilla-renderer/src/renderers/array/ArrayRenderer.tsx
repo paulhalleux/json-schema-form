@@ -14,8 +14,8 @@ export const ArrayRenderer = memo(function ArrayRenderer({
   path,
 }: BaseRendererProps) {
   const { value, push, remove, reorder } = useArrayField({
-    path,
     schema,
+    path,
   });
 
   const [selectedItemKey, setSelectedItemKey] = useState(value[0]?.key);
@@ -48,26 +48,27 @@ export const ArrayRenderer = memo(function ArrayRenderer({
     [remove],
   );
 
+  const schemaJson = schema.toJSON();
+
   return (
     <div className="space-y-2 w-full">
-      <SchemaHeader title={schema.title} description={schema.description} />
+      <SchemaHeader
+        title={schemaJson.title}
+        description={schemaJson.description}
+      />
       <div className="flex gap-2 max-h-72">
         <ArrayItemsNav
           value={value}
           addItem={addItem}
           deleteItem={deleteItem}
           reorderItem={reorder}
-          enableReorder={!Array.isArray(schema.items)}
+          enableReorder={!Array.isArray(schemaJson.items)}
           setSelectedItemKey={setSelectedItemKey}
           selectedItemKey={selectedItemKey}
         />
         <div className="flex flex-col p-2 border border-gray-300 rounded-sm w-full overflow-y-auto">
           {selectedItem ? (
-            <ArrayItemRenderer
-              key={selectedItem.key}
-              item={selectedItem}
-              schema={schema}
-            />
+            <ArrayItemRenderer key={selectedItem.key} item={selectedItem} />
           ) : (
             <EmptyState
               title="No item selected"

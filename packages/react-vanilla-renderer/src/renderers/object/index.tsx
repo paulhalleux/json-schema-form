@@ -10,14 +10,20 @@ const defaultObjectRenderer: SchemaRenderer = {
     builder.withType("object");
   }),
   priority: 11,
-  renderer: ({ schema, ...props }) => (
-    <div className="space-y-2 w-full">
-      <SchemaHeader title={schema.title} description={schema.description} />
-      <div className="flex flex-col space-y-2 w-full">
-        <RenderSchema schema={schema} {...props} />
+  renderer: ({ schema, ...props }) => {
+    const jsonSchema = schema.toJSON();
+    return (
+      <div className="space-y-2 w-full">
+        <SchemaHeader
+          title={jsonSchema.title}
+          description={jsonSchema.description}
+        />
+        <div className="flex flex-col space-y-2 w-full">
+          <RenderSchema schema={schema} {...props} />
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
 };
 
 export const objectRenderers = [defaultObjectRenderer];

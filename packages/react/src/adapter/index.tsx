@@ -70,12 +70,11 @@ export type FormProps = {
 export const RenderSchema = ({
   schema,
   path,
-  parentSchema,
   previousRenderers,
 }: BaseRendererProps) => {
   const instance = useFormInstance();
   const renderer = useMemo(() => {
-    return instance.getRenderer(schema, previousRenderers);
+    return instance.getRenderer(schema.toJSON(), previousRenderers);
   }, [instance, previousRenderers, schema]);
 
   if (!renderer) return "No renderer found";
@@ -84,7 +83,6 @@ export const RenderSchema = ({
     <renderer.renderer
       schema={schema}
       path={path}
-      parentSchema={parentSchema}
       previousRenderers={[...previousRenderers, renderer.id]}
     />
   );
@@ -98,12 +96,7 @@ export function Form({ form, children, ...rest }: FormProps) {
   return (
     <FormProvider value={form}>
       <form {...rest}>
-        <RenderSchema
-          schema={schema}
-          path={form.getFieldPath(undefined)}
-          parentSchema={undefined}
-          previousRenderers={[]}
-        />
+        <RenderSchema schema={schema} path="" previousRenderers={[]} />
         {children}
       </form>
     </FormProvider>

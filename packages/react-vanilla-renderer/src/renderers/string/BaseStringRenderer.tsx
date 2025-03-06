@@ -16,14 +16,12 @@ export type BaseStringRendererProps = BaseRendererProps & {
 export function BaseStringRenderer({
   schema,
   path,
-  parentSchema,
   ...fieldProps
 }: BaseStringRendererProps) {
   const { regex, min, max, type, step } = fieldProps;
   const { value, setValue, id, error, required } = useField<string>({
-    path,
-    parentSchema,
     schema,
+    path,
   });
 
   const onInputChange = useCallback(
@@ -34,21 +32,17 @@ export function BaseStringRenderer({
     [setValue],
   );
 
+  const schemaJson = schema.toJSON();
+
   return (
-    <Field
-      id={id}
-      label={schema.title}
-      help={schema.$comment}
-      error={error}
-      required={required}
-    >
+    <Field id={id} label={schemaJson.title} error={error} required={required}>
       <Input
         type={type}
         name={id}
         id={id}
         value={value ?? ""}
         onChange={onInputChange}
-        placeholder={schema.description}
+        placeholder={schemaJson.description}
         pattern={regex}
         min={min}
         max={max}

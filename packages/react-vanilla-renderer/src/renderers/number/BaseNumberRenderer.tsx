@@ -14,14 +14,12 @@ export type BaseNumberRendererProps = BaseRendererProps & {
 export function BaseNumberRenderer({
   schema,
   path,
-  parentSchema,
   ...fieldProps
 }: BaseNumberRendererProps) {
   const { min, max, step } = fieldProps;
   const { value, setValue, id, error, required } = useField<number>({
-    path,
-    parentSchema,
     schema,
+    path,
   });
 
   const onInputChange = useCallback(
@@ -37,21 +35,17 @@ export function BaseNumberRenderer({
     [setValue],
   );
 
+  const jsonSchema = schema.toJSON();
+
   return (
-    <Field
-      id={id}
-      label={schema.title}
-      help={schema.$comment}
-      error={error}
-      required={required}
-    >
+    <Field id={id} label={jsonSchema.title} error={error} required={required}>
       <Input
         type="number"
         name={id}
         id={id}
         value={value ?? ""}
         onChange={onInputChange}
-        placeholder={schema.description}
+        placeholder={jsonSchema.description}
         min={min}
         max={max}
         minLength={typeof min === "number" ? min : undefined}

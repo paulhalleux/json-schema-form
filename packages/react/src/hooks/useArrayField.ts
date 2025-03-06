@@ -1,12 +1,8 @@
 import React from "react";
 
-import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
-import {
-  SchemaDefault,
-  SchemaDefaultMode,
-} from "@phalleux/jsf-schema-utils/src";
+import type { AnySchemaValue } from "@phalleux/jsf-core";
 
-import { useFormInstance, useStore } from "../adapter";
+import { useStore } from "../adapter";
 
 import { type UseFieldArgs } from "./useField.ts";
 import { useKeyedArray } from "./useKeyedArray.ts";
@@ -19,11 +15,13 @@ import { useSetValue } from "./useSetValue.ts";
  * @returns The array field value, error and helper functions.
  */
 export function useArrayField<T extends AnySchemaValue>({
-  path,
   schema,
-}: Pick<UseFieldArgs, "path" | "schema">) {
-  const instance = useFormInstance();
-  const { setValue } = useSetValue<T[]>({ path });
+  path,
+}: UseFieldArgs) {
+  const { setValue } = useSetValue<T[]>({ schema, path });
+
+  const _schemaJson = schema.toJSON();
+  const schemaJson = typeof _schemaJson === "boolean" ? {} : _schemaJson;
 
   const items = useStore((_, form) => {
     const value = form.getFieldValue(path);
@@ -40,37 +38,39 @@ export function useArrayField<T extends AnySchemaValue>({
       return {
         key: item.key,
         value: item.item,
-        path: instance.getFieldPath(path, `${index}`),
-        schema: Array.isArray(schema.items)
-          ? schema.items[index % schema.items.length]
-          : schema.items,
+        path: `${path ?? ""}[${index}]`,
+        schema: Array.isArray(schemaJson.items)
+          ? schema.getSubSchema(`#/items/${index % schemaJson.items.length}`)
+          : schema.getSubSchema("#/items"),
       };
     },
-    [path, schema.items],
+    [schemaJson],
   );
 
   const push = React.useCallback(() => {
     const addedKey = _push();
 
     setValue((value) => {
-      const nextSchema = Array.isArray(schema.items)
-        ? schema.items[(value?.length ?? 0) % schema.items.length]
-        : schema.items;
+      // const nextSchema = Array.isArray(schemaJson.items)
+      //   ? schema.getSubSchema(
+      //       `#/items/${(value?.length ?? 0) % schemaJson.items.length}`,
+      //     )
+      //   : schema.getSubSchema(`#/items`);
 
-      const defaultItem = (
-        nextSchema
-          ? (SchemaDefault.get(nextSchema, {
-              refResolver: instance.store.getState().refResolver,
-              mode: SchemaDefaultMode.TypeDefault,
-            }) ?? null)
-          : null
-      ) as T;
+      // const defaultItem = (
+      //   nextSchema
+      //     ? (SchemaDefault.get(nextSchema, {
+      //         refResolver: instance.store.getState().refResolver,
+      //         mode: SchemaDefaultMode.TypeDefault,
+      //       }) ?? null)
+      //     : null
+      // ) as T;
 
-      return [...(value ?? []), defaultItem];
+      return [...(value ?? []), null as T];
     });
 
     return addedKey;
-  }, [_push, instance.store, schema.items, setValue]);
+  }, [_push, setValue]);
 
   const remove = React.useCallback(
     (index: number) => {

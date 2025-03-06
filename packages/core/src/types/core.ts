@@ -1,12 +1,17 @@
-import type { ErrorObject } from "ajv";
-import type { RefResolver } from "json-schema-ref-resolver";
-
-import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
+import type { ObjectSchema } from "@phalleux/jsf-schema-utils";
+import { Schema } from "@phalleux/jsf-schema-utils";
 
 import type { Register } from "./register.ts";
 import type { SchemaRenderer } from "./renderer.ts";
-import type { FormJsonSchema } from "./schema.ts";
 import type { StoreApi, StoreUpdater } from "./store.ts";
+
+export type AnySchemaValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Record<string, any>
+  | any[];
 
 /**
  * {@link FormState}
@@ -14,10 +19,8 @@ import type { StoreApi, StoreUpdater } from "./store.ts";
  * This type is used to define the state of the form
  */
 export interface FormState {
-  refResolver: RefResolver;
-  schema: FormJsonSchema;
+  schema: Schema<ObjectSchema>;
   value: AnySchemaValue;
-  errors: ErrorObject[] | null;
   flags: Map<string, boolean>;
   renderers: SchemaRenderer[];
 }
@@ -41,9 +44,9 @@ export type FormStore = Register extends {
  */
 export type FormOptions = {
   createStore: FormStoreFactory;
-  schema: FormJsonSchema;
+  schema: ObjectSchema;
   defaultValue?: AnySchemaValue;
-  references?: Record<string, FormJsonSchema>;
+  additionalReferences?: Record<string, ObjectSchema>;
   renderers?: Array<SchemaRenderer>;
 };
 
@@ -81,25 +84,14 @@ export interface Form extends FormCoreApi {
   getFieldValue: (path: string) => AnySchemaValue | null;
 
   // Schema management
-  getSchema: () => FormJsonSchema;
-  setSchema: (schema: FormJsonSchema) => void;
-  getRefSchema: (path: string) => FormJsonSchema | null;
-  getFieldPath: (parentPath: string | undefined, key?: string) => string;
-
-  // Validation
-  isRequired: (path: string, parentSchema?: FormJsonSchema) => boolean;
-  validate: () => true | ErrorObject[];
-  getFieldErrors: (path: string) => ErrorObject[];
+  getSchema: () => Schema<ObjectSchema>;
+  setSchema: (schema: ObjectSchema) => void;
 
   // Rendering
   getRenderer: (
-    schema: FormJsonSchema,
+    schema: ObjectSchema,
     previousRenderers: string[],
   ) => SchemaRenderer | null;
-  setRenderers: (renderers: SchemaRenderer[]) => void;
-  addRenderer: (renderer: SchemaRenderer) => void;
-  removeRenderer: (id: string) => void;
-  hasRenderer: (id: string) => boolean;
 
   // Flags
   setFlag: (flag: string, value: boolean) => void;

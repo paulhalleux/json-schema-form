@@ -1,9 +1,9 @@
-import type { FormJsonSchema } from "@phalleux/jsf-core";
+import type { ObjectSchema } from "@phalleux/jsf-schema-utils";
 
 export type SchemaExample = {
   id: string;
   title: string;
-  schema: FormJsonSchema;
+  schema: ObjectSchema;
 };
 
 export type SchemaExampleCategory = {

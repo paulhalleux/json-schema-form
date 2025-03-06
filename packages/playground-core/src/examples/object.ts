@@ -100,5 +100,64 @@ export const ObjectExamples: SchemaExampleCategory = {
         $ref: "#/definitions/person",
       },
     },
+    {
+      id: "object-deep-ref",
+      title: "Deep Ref",
+      schema: {
+        type: "object",
+        title: "Object",
+        description: "A simple object",
+        properties: {
+          person: {
+            definitions: {
+              person: {
+                type: "object",
+                required: ["name"],
+                properties: {
+                  name: {
+                    type: "string",
+                    title: "Name",
+                    description: "A simple string",
+                  },
+                },
+              },
+            },
+            $ref: "#/definitions/person",
+          },
+        },
+      },
+    },
+    {
+      id: "object-nested-ref",
+      title: "Nested Ref",
+      schema: {
+        definitions: {
+          person: {
+            type: "object",
+            required: ["name"],
+            properties: {
+              name: {
+                definitions: {
+                  name: {
+                    type: "string",
+                    title: "Name",
+                    description: "A simple string",
+                  },
+                },
+                $ref: "#/definitions/name",
+              },
+            },
+          },
+        },
+        type: "object",
+        title: "Object",
+        description: "A simple object",
+        properties: {
+          person: {
+            $ref: "#/definitions/person",
+          },
+        },
+      },
+    },
   ],
 };

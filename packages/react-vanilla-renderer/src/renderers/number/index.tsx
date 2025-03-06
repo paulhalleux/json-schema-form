@@ -9,23 +9,28 @@ const defaultNumberRenderer: SchemaRenderer = {
     builder.withType("number");
   }),
   priority: 0,
-  renderer: ({ schema, ...props }) => (
-    <BaseNumberRenderer
-      schema={schema}
-      {...props}
-      min={
-        schema.minimum === undefined && schema.exclusiveMinimum !== undefined
-          ? schema.exclusiveMinimum + 1
-          : schema.minimum
-      }
-      max={
-        schema.maximum === undefined && schema.exclusiveMaximum !== undefined
-          ? schema.exclusiveMaximum - 1
-          : schema.maximum
-      }
-      step={schema.multipleOf}
-    />
-  ),
+  renderer: ({ schema, ...props }) => {
+    const jsonSchema = schema.toJSON();
+    return (
+      <BaseNumberRenderer
+        schema={schema}
+        {...props}
+        min={
+          jsonSchema.minimum === undefined &&
+          jsonSchema.exclusiveMinimum !== undefined
+            ? jsonSchema.exclusiveMinimum + 1
+            : jsonSchema.minimum
+        }
+        max={
+          jsonSchema.maximum === undefined &&
+          jsonSchema.exclusiveMaximum !== undefined
+            ? jsonSchema.exclusiveMaximum - 1
+            : jsonSchema.maximum
+        }
+        step={jsonSchema.multipleOf}
+      />
+    );
+  },
 };
 
 export const numberRenderers = [defaultNumberRenderer];

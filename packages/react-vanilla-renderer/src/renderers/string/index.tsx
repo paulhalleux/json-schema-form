@@ -10,16 +10,23 @@ const defaultStringRenderer: SchemaRenderer = {
     builder.withType("string");
   }),
   priority: 0,
-  renderer: ({ schema, ...props }) => (
-    <BaseStringRenderer
-      schema={schema}
-      {...props}
-      type="text"
-      min={schema.minLength}
-      max={schema.maxLength}
-      regex={schema.pattern}
-    />
-  ),
+  renderer: ({ schema, ...props }) => {
+    const schemaJson = schema.toJSON();
+    if (typeof schemaJson === "boolean") {
+      return null;
+    }
+
+    return (
+      <BaseStringRenderer
+        schema={schema}
+        {...props}
+        type="text"
+        min={schemaJson.minLength}
+        max={schemaJson.maxLength}
+        regex={schemaJson.pattern}
+      />
+    );
+  },
 };
 
 export const stringRenderers = [defaultStringRenderer, ...formats];

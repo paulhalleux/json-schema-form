@@ -1,4 +1,7 @@
 {
   "extends": "@total-typescript/tsconfig/bundler/no-dom",
-  "include": ["vite.config.ts", "vitest.config.ts"]
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
+  "include": ["vitest.config.ts", "tests/**/*.test.ts", "src/**/*.test.ts"]
 }

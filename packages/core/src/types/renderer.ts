@@ -1,9 +1,7 @@
-import type { Ajv } from "ajv";
-
-import type { SchemaTester } from "@phalleux/jsf-schema-utils";
+import type { ObjectSchema, SchemaTester } from "@phalleux/jsf-schema-utils";
+import { Schema } from "@phalleux/jsf-schema-utils";
 
 import type { Register } from "./register.ts";
-import type { FormJsonSchema } from "./schema.ts";
 
 /**
  * Base renderer props
@@ -12,17 +10,14 @@ import type { FormJsonSchema } from "./schema.ts";
  */
 export type BaseRendererProps = {
   /**
-   * The path of the schema
-   */
-  path: string;
-  /**
    * The schema to render
    */
-  schema: FormJsonSchema;
+  schema: Schema<ObjectSchema>;
+
   /**
-   * The parent schema of the current schema
+   * The path of the value
    */
-  parentSchema: FormJsonSchema | undefined;
+  path: string;
 
   /**
    * The previous renderers that were used
@@ -70,9 +65,4 @@ export type SchemaRenderer = {
    * The renderer to render the schema
    */
   renderer: RendererType;
-  /**
-   * Define validation for the schema
-   * @param ajv The ajv instance to define validation
-   */
-  defineValidation?: (ajv: Ajv) => void;
 };

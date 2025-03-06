@@ -3,6 +3,7 @@ import React, {
   type PropsWithChildren,
   useEffect,
   useMemo,
+  useState,
   useSyncExternalStore,
 } from "react";
 import { Outlet, Route, Routes, useParams } from "react-router";
@@ -79,9 +80,13 @@ export const Playground = memo(function Playground(props: PlaygroundProps) {
   );
 });
 
-const schemaSelector = (state: FormState) => state.schema;
 const valueSelector = (state: FormState) => state.value;
-const errorsSelector = (state: FormState) => state.errors;
+const schemaSelector = (state: FormState) =>
+  JSON.stringify(state.schema.toJSON(), null, 2);
+const schemaDerefSelector = (state: FormState) =>
+  JSON.stringify(state.schema.toDereferenced().toMergedJSON(), null, 2);
+const schemaDeepDerefSelector = (state: FormState) =>
+  JSON.stringify(state.schema.toDeepDereferencedJSON(), null, 2);
 
 const PlaygroundPage = memo(function PlaygroundPage({
   form,
@@ -136,6 +141,7 @@ const ExamplePage = memo(function ExamplePage({
   );
 });
 
+const MODES = ["default", "dereferenced", "deep-dereferenced"] as const;
 const SchemaDisplay = memo(function SchemaDisplay({
   form,
   editable = false,
@@ -143,20 +149,53 @@ const SchemaDisplay = memo(function SchemaDisplay({
   form: Form;
   editable?: boolean;
 }) {
-  const schema = useFormStore(form, schemaSelector);
+  const [mode, setMode] = useState<(typeof MODES)[number]>("default");
+
+  const schemaDefault = useFormStore(form, schemaSelector);
+  const schemaDeref = useFormStore(form, schemaDerefSelector);
+  const schemaDeepDeref = useFormStore(form, schemaDeepDerefSelector);
+
+  const modeToSchema = {
+    default: schemaDefault,
+    dereferenced: schemaDeref,
+    "deep-dereferenced": schemaDeepDeref,
+  };
+
+  const onClick = (mode: (typeof MODES)[number]) => {
+    setMode(mode);
+  };
+
   return (
     <PlaygroundSection title="Schema" cols={2} rows={1}>
-      <Code
-        value={JSON.stringify(schema, null, 2)}
-        editable={editable}
-        onChange={(value) => {
-          try {
-            form.setSchema(JSON.parse(value));
-          } catch (e) {
-            console.error(e);
-          }
-        }}
-      />
+      {!editable && (
+        <div className="border-b border-neutral-300 p-1 flex gap-1">
+          {MODES.map((m) => (
+            <button
+              key={m}
+              onClick={() => onClick(m)}
+              className={`text-xs border border-neutral-300 rounded px-1 py-0.5 pt-1 cursor-pointer hover:bg-neutral-200 ${
+                m === mode ? "bg-neutral-200" : ""
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="h-full min-h-0">
+        <Code
+          value={editable ? schemaDefault : modeToSchema[mode]}
+          editable={editable}
+          onChange={(value) => {
+            if (!editable) return;
+            try {
+              form.setSchema(JSON.parse(value));
+            } catch (e) {
+              console.error(e);
+            }
+          }}
+        />
+      </div>
     </PlaygroundSection>
   );
 });
@@ -170,11 +209,11 @@ const ValueDisplay = memo(function ValueDisplay({ form }: { form: Form }) {
   );
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ErrorsDisplay = memo(function ErrorsDisplay({ form }: { form: Form }) {
-  const errors = useFormStore(form, errorsSelector);
   return (
     <PlaygroundSection title="Errors" cols={1} rows={1}>
-      <Code value={JSON.stringify(errors, null, 2)} />
+      <Code value={JSON.stringify({}, null, 2)} />
     </PlaygroundSection>
   );
 });

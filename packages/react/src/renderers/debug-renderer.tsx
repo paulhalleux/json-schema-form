@@ -21,8 +21,13 @@ export const debugRenderer: SchemaRenderer = {
     return (
       <div className="w-full border rounded-sm overflow-hidden">
         <div className="text-xs h-6 bg-black text-white px-1 flex items-center gap-1">
+          <span>Schema:</span>
+          <span className="opacity-50">{props.schema.getPath()}</span>
+          <span> | </span>
           <span>Path:</span>
-          <span className="opacity-50">{props.path}</span>
+          <span className="opacity-50">
+            {props.path === "" ? "#root" : props.path}
+          </span>
         </div>
         <div className="p-1 w-full">
           <RenderSchema {...props} />

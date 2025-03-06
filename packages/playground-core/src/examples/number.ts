@@ -1,4 +1,4 @@
-import { formatNames } from "ajv-formats/dist/formats";
+import { formatNames } from "@phalleux/jsf-schema-utils";
 
 import type { SchemaExampleCategory } from "../types/examples.ts";
 

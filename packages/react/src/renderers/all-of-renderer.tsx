@@ -1,11 +1,5 @@
-import { useMemo } from "react";
-
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import {
-  AllOfMerger,
-  isBooleanStartSchema,
-  Tester,
-} from "@phalleux/jsf-schema-utils";
+import { Tester } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema } from "../adapter";
 
@@ -18,14 +12,6 @@ export const allOfRenderer: SchemaRenderer = {
   tester: allOfTester,
   priority: 10,
   renderer: function AllOfRenderer({ schema, ...props }: BaseRendererProps) {
-    const merged = useMemo(() => {
-      const merged = AllOfMerger.merge(schema);
-      if (isBooleanStartSchema(merged)) {
-        return {};
-      }
-      return merged;
-    }, [schema]);
-
-    return <RenderSchema schema={merged} {...props} />;
+    return <RenderSchema schema={schema.toMerged()} {...props} />;
   },
 };

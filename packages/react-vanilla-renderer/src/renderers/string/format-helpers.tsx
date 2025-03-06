@@ -1,8 +1,5 @@
-import type {
-  BaseRendererProps,
-  FormJsonSchema,
-  SchemaRenderer,
-} from "@phalleux/jsf-core";
+import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
+import type { ObjectSchema } from "@phalleux/jsf-schema-utils";
 import { Tester } from "@phalleux/jsf-schema-utils";
 
 import type { BaseStringRendererProps } from "./BaseStringRenderer.tsx";
@@ -22,7 +19,7 @@ export const createFormatRenderer = ({
   format: string | string[];
   priority?: number;
   getProps: (
-    schema: FormJsonSchema,
+    schema: ObjectSchema,
   ) => Omit<BaseStringRendererProps, keyof BaseRendererProps>;
 }): SchemaRenderer => ({
   id: `react-vanilla.string.format.${format}`,
@@ -35,15 +32,18 @@ export const createFormatRenderer = ({
     }
   }),
   priority,
-  renderer: ({ schema, ...props }) => (
-    <BaseStringRenderer
-      schema={schema}
-      {...props}
-      type="text"
-      min={schema.minLength}
-      max={schema.maxLength}
-      regex={schema.pattern}
-      {...getProps(schema)}
-    />
-  ),
+  renderer: ({ schema, ...props }) => {
+    const schemaJson = schema.toJSON();
+    return (
+      <BaseStringRenderer
+        schema={schema}
+        {...props}
+        type="text"
+        min={schemaJson.minLength}
+        max={schemaJson.maxLength}
+        regex={schemaJson.pattern}
+        {...getProps(schemaJson)}
+      />
+    );
+  },
 });

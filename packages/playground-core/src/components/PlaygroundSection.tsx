@@ -21,7 +21,7 @@ export const PlaygroundSection = memo(function PlaygroundSection({
       }}
     >
       <h2 className="font-bold text-sm">{title}</h2>
-      <div className="bg-white border border-neutral-300 h-full rounded-md overflow-hidden">
+      <div className="bg-white border border-neutral-300 h-full rounded-md overflow-hidden flex flex-col min-h-0">
         {children}
       </div>
     </div>

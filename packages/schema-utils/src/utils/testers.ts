@@ -1,16 +1,4 @@
-import type { BaseJsonSchema } from "../types/schema.ts";
 import type { SchemaTester } from "../types/tester.ts";
-
-/**
- * Test if the schema is a boolean schema
- * @param schema The schema to test
- * @returns True if the schema is a boolean schema
- */
-export const isBooleanStartSchema = (
-  schema: BaseJsonSchema,
-): schema is boolean => {
-  return schema === true || schema === false;
-};
 
 /**
  * Builder for a schema tester

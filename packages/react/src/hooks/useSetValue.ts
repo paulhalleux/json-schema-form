@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 
-import type { AnySchemaValue } from "@phalleux/jsf-schema-utils";
+import type { AnySchemaValue } from "@phalleux/jsf-core";
 
 import { useFormInstance } from "../adapter";
 
 import type { UseFieldArgs } from "./useField.ts";
 
 export function useSetValue<T extends AnySchemaValue>({
-  path,
-}: Pick<UseFieldArgs, "path">) {
+  path = "",
+}: UseFieldArgs) {
   const instance = useFormInstance();
 
   const setValue = useCallback(
@@ -19,7 +19,6 @@ export function useSetValue<T extends AnySchemaValue>({
       } else {
         instance.setFieldValue(path, value);
       }
-      instance.validate();
     },
     [instance, path],
   );

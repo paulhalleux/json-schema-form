@@ -83,10 +83,15 @@ export const Playground = memo(function Playground(props: PlaygroundProps) {
 const valueSelector = (state: FormState) => state.value;
 const schemaSelector = (state: FormState) =>
   JSON.stringify(state.schema.toJSON(), null, 2);
-const schemaDerefSelector = (state: FormState) =>
-  JSON.stringify(state.schema.toDereferenced().toMergedJSON(), null, 2);
-const schemaDeepDerefSelector = (state: FormState) =>
-  JSON.stringify(state.schema.toDeepResolvedJSON(), null, 2);
+const schemaResolvedSelector = (state: FormState) =>
+  JSON.stringify(
+    state.schema
+      .toDereferenced()
+      .applyConditionFor(state.value)
+      .toResolvedJSON(state.value),
+    null,
+    2,
+  );
 
 const PlaygroundPage = memo(function PlaygroundPage({
   form,
@@ -141,7 +146,7 @@ const ExamplePage = memo(function ExamplePage({
   );
 });
 
-const MODES = ["default", "dereferenced", "deep-dereferenced"] as const;
+const MODES = ["default", "resolved"] as const;
 const SchemaDisplay = memo(function SchemaDisplay({
   form,
   editable = false,
@@ -152,13 +157,11 @@ const SchemaDisplay = memo(function SchemaDisplay({
   const [mode, setMode] = useState<(typeof MODES)[number]>("default");
 
   const schemaDefault = useFormStore(form, schemaSelector);
-  const schemaDeref = useFormStore(form, schemaDerefSelector);
-  const schemaDeepDeref = useFormStore(form, schemaDeepDerefSelector);
+  const schemaResolved = useFormStore(form, schemaResolvedSelector);
 
   const modeToSchema = {
     default: schemaDefault,
-    dereferenced: schemaDeref,
-    "deep-dereferenced": schemaDeepDeref,
+    resolved: schemaResolved,
   };
 
   const onClick = (mode: (typeof MODES)[number]) => {

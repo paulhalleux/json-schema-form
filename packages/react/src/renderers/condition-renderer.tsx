@@ -17,15 +17,15 @@ export const conditionRenderer: SchemaRenderer = {
     ...props
   }: BaseRendererProps) {
     const value = useStore((_, form) => {
-      const parentPath = path.endsWith("]")
-        ? path.slice(0, path.lastIndexOf("["))
-        : path.split(".").slice(0, -1).join(".");
-      return form.getFieldValue(parentPath);
+      return form.getFieldValue(path);
     });
+
+    const conditioned = schema.applyConditionFor(value);
+    if (!conditioned || conditioned.isBooleanSchema()) return null;
 
     return (
       <RenderSchema
-        schema={schema.withAppliedCondition(value)}
+        schema={conditioned.asObjectSchema()}
         path={path}
         {...props}
       />

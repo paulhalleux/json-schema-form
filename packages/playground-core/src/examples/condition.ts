@@ -16,8 +16,55 @@ export const ConditionExamples: SchemaExampleCategory = {
           age: {
             type: "number",
           },
-          isAdult: {
+        },
+        if: {
+          properties: {
+            name: {
+              const: "John",
+            },
+          },
+        },
+        then: {
+          properties: {
+            age: {
+              type: "number",
+              minimum: 18,
+            },
+          },
+        },
+        else: {
+          properties: {
+            age: {
+              type: "number",
+              minimum: 21,
+            },
+          },
+        },
+      },
+    },
+    {
+      id: "condition-all-of",
+      title: "AllOf",
+      schema: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+          },
+          age: {
+            type: "number",
+          },
+        },
+        allOf: [
+          {
             if: {
+              properties: {
+                name: {
+                  const: "John",
+                },
+              },
+            },
+            then: {
               properties: {
                 age: {
                   type: "number",
@@ -25,16 +72,16 @@ export const ConditionExamples: SchemaExampleCategory = {
                 },
               },
             },
-            then: {
-              title: "Adult",
-              type: "string",
-            },
             else: {
-              title: "Minor",
-              type: "string",
+              properties: {
+                age: {
+                  type: "number",
+                  minimum: 21,
+                },
+              },
             },
           },
-        },
+        ],
       },
     },
   ],

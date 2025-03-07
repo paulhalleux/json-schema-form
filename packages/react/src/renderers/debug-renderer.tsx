@@ -21,7 +21,9 @@ export const debugRenderer: SchemaRenderer = {
     return (
       <div className="w-full border rounded-sm overflow-hidden">
         <div className="text-xs h-6 bg-black text-white px-1 flex items-center gap-1">
-          <span>Schema:</span>
+          <span title={JSON.stringify(props.schema.toJSON(), null, 2)}>
+            Schema:
+          </span>
           <span className="opacity-50">{props.schema.getPath()}</span>
           <span> | </span>
           <span>Path:</span>

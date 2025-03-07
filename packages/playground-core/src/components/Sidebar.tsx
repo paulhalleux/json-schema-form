@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { clsx } from "clsx";
-import { ArrowRightIcon, BoxesIcon } from "lucide-react";
+import { ArrowRightIcon, BoxesIcon, ShovelIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 
 import type {
@@ -44,10 +44,16 @@ export const Sidebar = memo(function Sidebar({
         <span className="text-neutral-700 text-xs font-medium">{name}</span>
       </header>
       <div className="flex flex-col gap-1">
-        <NavButton onClick={onPlaygroundClick} className="my-1.5">
-          <ArrowRightIcon size={14} className="mr-2" />
-          Playground
-        </NavButton>
+        <div className="my-1.5 flex flex-col gap-1">
+          <NavButton onClick={onPlaygroundClick}>
+            <ArrowRightIcon size={14} className="mr-2" />
+            Playground
+          </NavButton>
+          <NavButton onClick={onPlaygroundClick}>
+            <ShovelIcon size={14} className="mr-2" />
+            Builder
+          </NavButton>
+        </div>
         <h2 className="text-neutral-800 text-sm font-semibold px-2 mb-1">
           Examples
         </h2>

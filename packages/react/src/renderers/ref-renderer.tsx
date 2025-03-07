@@ -12,6 +12,8 @@ export const refRenderer: SchemaRenderer = {
   tester: refTester,
   priority: 10,
   renderer: function RedRenderer({ schema, ...props }: BaseRendererProps) {
-    return <RenderSchema schema={schema.toDereferenced()} {...props} />;
+    const dereferenced = schema.toDereferenced();
+    if (dereferenced.isBooleanSchema()) return null;
+    return <RenderSchema schema={dereferenced.asObjectSchema()} {...props} />;
   },
 };

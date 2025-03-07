@@ -1,5 +1,5 @@
-import Ajv2020 from "ajv/dist/2020";
-import { merge, omit } from "lodash";
+import Ajv, { type ValidateFunction } from "ajv";
+import { clone, merge } from "lodash";
 
 import type { JsonSchema, ObjectSchema } from "./types";
 
@@ -9,6 +9,9 @@ export class Schema<T extends JsonSchema = JsonSchema> {
 
   private readonly root: Schema;
   private readonly parent: Schema | undefined;
+
+  private readonly ajv: Ajv;
+  private validator: ValidateFunction | undefined;
 
   /**
    * A map of sub-schemas.
@@ -31,6 +34,17 @@ export class Schema<T extends JsonSchema = JsonSchema> {
 
     this.schema = definition;
     this.definitions = this.generateDefinitions();
+
+    // Construct the validator by adding all definitions to the Ajv instance.
+    this.ajv = new Ajv({ formats: {}, strict: false });
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let s: Schema | undefined = this;
+    while (s) {
+      s.definitions.forEach((definition, key) => {
+        this.ajv.addSchema(definition, key);
+      });
+      s = s.parent;
+    }
   }
 
   /**
@@ -80,14 +94,17 @@ export class Schema<T extends JsonSchema = JsonSchema> {
    * @returns {boolean} `true` if the data is valid, otherwise `false`.
    */
   validate(data: unknown): boolean {
-    const ajv = new Ajv2020();
-    const validate = ajv.compile(this.schema);
-    validate(data);
-    return !validate.errors?.length;
+    if (!this.validator) {
+      this.validator = this.ajv.compile(this.schema);
+    }
+    this.validator(data);
+    return !this.validator.errors?.length;
   }
 
   /**
    * Returns the dereferenced JSON schema object.
+   * Will resolve top-level $ref properties and optionally $refs contained in the resolved schema.
+   * Will not resolve nested $refs in properties and items.
    * @returns {JsonSchema} The dereferenced JSON schema object.
    */
   toDereferencedJSON() {
@@ -101,107 +118,56 @@ export class Schema<T extends JsonSchema = JsonSchema> {
         return schema;
       }
 
-      return merge({}, omit(schema, ["$ref"]), _dereference(referencedSchema));
+      delete schema.$ref;
+      return merge(schema, _dereference(referencedSchema));
     };
-    return _dereference(this.schema);
+    return _dereference(clone(this.schema));
   }
 
   /**
    * Returns a new schema object with a dereferenced JSON schema.
+   * Will resolve top-level $ref properties and optionally $refs contained in the resolved schema..
+   * Will not resolve nested $refs in properties and items.
    * @returns {Schema} The new schema object.
    */
   toDereferenced() {
-    return new Schema<T>(
-      this.toDereferencedJSON() as T,
-      this.parent,
-      this.path,
-    );
+    return this.cloneWith(this.toDereferencedJSON());
   }
 
   /**
-   * Returns the merged JSON schema object.
+   * Will merge allOf properties in the schema object.
+   * Will resolve top-level $ref properties.
+   * If allOf properties have an `if` and `then` property, it will apply the condition.
    * @returns {JsonSchema} The merged JSON schema object.
    */
-  toMergedJSON(): T {
+  toResolvedJSON(value: unknown): JsonSchema {
     const _merge = (schema: JsonSchema): JsonSchema => {
       if (typeof schema === "boolean" || !schema.allOf) {
         return schema;
       }
-      return merge(omit(schema, ["allOf"]), ...schema.allOf.map(_merge));
+
+      const parts = [];
+      for (let i = 0; i < schema.allOf.length; i++) {
+        const subSchema = this.getSubSchema(`#/allOf/${i}`);
+        const conditionSchema = subSchema?.applyConditionFor(value);
+        if (conditionSchema) {
+          const dereferencedSchema = conditionSchema.toDereferencedJSON();
+          if (typeof dereferencedSchema === "boolean") {
+            continue;
+          }
+          parts.push(dereferencedSchema);
+        }
+      }
+
+      delete schema.allOf;
+      return _merge(merge(schema, ...parts));
     };
-    return _merge(this.schema) as T;
+
+    return _merge(clone(this.schema)) as T;
   }
 
-  /**
-   * Returns a new schema object with a merged JSON schema.
-   * @returns {Schema} The new schema object
-   */
-  toMerged() {
-    return new Schema(this.toMergedJSON(), this.parent, this.path);
-  }
-
-  /**
-   * Similar to `toDereferencedJSON` but resolves nested $ref in properties and items by getting the sub-schema.
-   * This also merges the allOf properties.
-   */
-  toDeepResolvedJSON(): JsonSchema {
-    const dereferenced = this.toMerged().toDereferenced();
-    const clone = merge({}, dereferenced.toJSON());
-
-    if (typeof clone === "boolean") {
-      return clone;
-    }
-
-    if (clone.properties) {
-      for (const [key] of Object.entries(clone.properties)) {
-        clone.properties[key] = dereferenced
-          .getSubSchema(`#/properties/${key}`)
-          .toMerged()
-          .toDeepResolvedJSON();
-      }
-    }
-
-    if (clone.items) {
-      if (Array.isArray(clone.items)) {
-        clone.items = clone.items.map((_, index) => {
-          return dereferenced
-            .getSubSchema(`#/items/${index}`)
-            .toMerged()
-            .toDeepResolvedJSON();
-        }) as [JsonSchema, ...JsonSchema[]];
-      } else {
-        clone.items = dereferenced
-          .getSubSchema("#/items")
-          .toMerged()
-          .toDeepResolvedJSON();
-      }
-    }
-
-    return this.deepRemoveDefinition(clone);
-  }
-
-  private deepRemoveDefinition(schema: JsonSchema) {
-    if (typeof schema === "boolean") {
-      return schema;
-    }
-
-    if (schema.properties) {
-      for (const [, value] of Object.entries(schema.properties)) {
-        this.deepRemoveDefinition(value);
-      }
-    }
-
-    if (schema.items) {
-      if (Array.isArray(schema.items)) {
-        schema.items.forEach((item) => this.deepRemoveDefinition(item));
-      } else {
-        this.deepRemoveDefinition(schema.items);
-      }
-    }
-
-    delete schema.definitions;
-    delete schema.$defs;
-    return schema;
+  toResolved(value: unknown): Schema {
+    return this.cloneWith(this.toResolvedJSON(value));
   }
 
   /**
@@ -244,6 +210,7 @@ export class Schema<T extends JsonSchema = JsonSchema> {
 
   /**
    * Dereferences the JSON schema object.
+   * This method mutates the current schema object.
    * It will first look for a definition in the root schema object.
    * @note This method is recursive and dereference directly nested $ref, direct-circular references are not supported.
    * @private
@@ -253,12 +220,66 @@ export class Schema<T extends JsonSchema = JsonSchema> {
   }
 
   /**
+   * Applies the condition for the schema object with the given value.
+   * If the schema object has an `if` and `then` property, it will apply the condition.
+   * If the condition is true, it will return the `then` schema, otherwise the `else` schema.
+   * If the condition is false and there is no `else` schema, it will return the schema object without the condition properties.
+   * @param value - The value to apply the condition.
+   */
+  applyConditionFor(value: unknown) {
+    const _applyCondition = (schema: JsonSchema): Schema => {
+      if (typeof schema === "boolean" || !schema.if || !schema.then) {
+        return this;
+      }
+
+      const ifSchema = this.getSubSchema("#/if");
+      const thenSchema = this.getSubSchema("#/then");
+      const elseSchema = this.getSubSchema("#/else");
+
+      delete schema.if;
+      delete schema.then;
+      delete schema.else;
+
+      if (!ifSchema || !thenSchema) {
+        return this.cloneWith(schema);
+      }
+
+      const valid = ifSchema.validate(value);
+      const finalSchema = valid ? thenSchema : elseSchema;
+
+      if (!finalSchema) {
+        return this.cloneWith(schema);
+      }
+
+      return this.cloneWith(merge(schema, finalSchema.toJSON()));
+    };
+
+    return _applyCondition(clone(this.schema));
+  }
+
+  /**
+   * Clones the schema object with the given schema.
+   * It will keep the parent and path of the current schema object.
+   * @param schema - The schema object to clone.
+   */
+  cloneWith(schema: JsonSchema): Schema {
+    return new Schema(schema, this.parent, this.path);
+  }
+
+  /**
    * Returns a sub-schema object.
+   * If the sub-schema object does not exist, it will create a new schema object.
+   * If the sub-schema object is a boolean, it will return the current schema object.
+   * If the sub-schema is not found, it will return `undefined`.
    * @param {string} ref - The JSON pointer reference.
    * @returns {Schema} The sub-schema object.
    */
   private createSubSchema(ref: string) {
     const subSchema = this.resolveReference(ref);
+    if (!subSchema) {
+      return undefined;
+    }
+
     this.subSchemaMap.set(ref, subSchema);
     return subSchema;
   }
@@ -269,16 +290,14 @@ export class Schema<T extends JsonSchema = JsonSchema> {
    * @param {string} ref - The JSON pointer reference.
    * @returns {JsonSchema} The JSON schema object.
    */
-  private resolveReference(ref: string) {
+  private resolveReference(ref: string): Schema | undefined {
     if (typeof this.schema === "boolean") {
-      throw new Error("Cannot resolve reference on a boolean schema");
+      return undefined;
     }
 
     const [, schemaProperty, propertyName] = ref.split("/");
     if (!schemaProperty) {
-      throw new Error(
-        `Invalid JSON pointer reference: ${ref}, expected "#/path/to/property"`,
-      );
+      return undefined;
     }
 
     let subSchema = this.schema[schemaProperty as keyof ObjectSchema];
@@ -290,7 +309,7 @@ export class Schema<T extends JsonSchema = JsonSchema> {
     }
 
     if (!subSchema) {
-      throw new Error(`Cannot resolve reference: ${ref}`);
+      return undefined;
     }
 
     return new Schema(subSchema, this, path);
@@ -323,33 +342,30 @@ export class Schema<T extends JsonSchema = JsonSchema> {
     return definitions;
   }
 
-  public withAppliedCondition(value: unknown) {
-    if (typeof this.schema === "boolean") {
-      throw new Error("Cannot apply condition on a non-object schema");
-    }
-
-    const ifSchema = this.getSubSchema("#/if");
-    const valid = ifSchema.validate(value);
-
-    const finalSchema = valid
-      ? this.getSubSchema("#/then")
-      : this.getSubSchema("#/else");
-
-    return new Schema(
-      merge(
-        {},
-        omit(this.schema, ["if", "then", "else"]),
-        finalSchema.toJSON(),
-      ),
-      this.parent,
-      this.path,
-    );
+  /**
+   * Returns the schema object as an object schema.
+   */
+  public asObjectSchema(): Schema<ObjectSchema> {
+    return this as Schema<ObjectSchema>;
   }
 
+  /**
+   * Returns the schema object as a boolean schema.
+   */
+  public asBooleanSchema(): Schema<boolean> {
+    return this as Schema<boolean>;
+  }
+
+  /**
+   * Checks if the schema object is an object schema.
+   */
   public isObjectSchema(): this is Schema<ObjectSchema> {
     return typeof this.schema === "object";
   }
 
+  /**
+   * Checks if the schema object is a boolean schema.
+   */
   public isBooleanSchema(): this is Schema<boolean> {
     return typeof this.schema === "boolean";
   }

@@ -1,16 +1,14 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema } from "../adapter";
+import { Priorities } from "../constants/priorities.ts";
 
-const objectTester = Tester((builder) => {
-  builder.withType("object");
-});
+const objectTester = createTester(Priorities.OBJECT, test.object);
 
 export const objectRenderer: SchemaRenderer = {
   id: "react.builtin.object",
   tester: objectTester,
-  priority: 10,
   renderer: function ObjectRenderer({ schema, path }: BaseRendererProps) {
     const jsonSchema = schema.toJSON();
     if (!jsonSchema.properties) {

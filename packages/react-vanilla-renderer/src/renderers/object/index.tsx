@@ -1,15 +1,14 @@
 import type { SchemaRenderer } from "@phalleux/jsf-core";
-import { RenderSchema } from "@phalleux/jsf-react";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { Priorities, RenderSchema } from "@phalleux/jsf-react";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { SchemaHeader } from "../../components";
 
-const defaultObjectRenderer: SchemaRenderer = {
+const objectTester = createTester(Priorities.OBJECT + 1, test.object);
+
+export const defaultObjectRenderer: SchemaRenderer = {
   id: "react-vanilla.object.default",
-  tester: Tester((builder) => {
-    builder.withType("object");
-  }),
-  priority: 11,
+  tester: objectTester,
   renderer: ({ schema, ...props }) => {
     const jsonSchema = schema.toJSON();
     return (
@@ -25,5 +24,3 @@ const defaultObjectRenderer: SchemaRenderer = {
     );
   },
 };
-
-export const objectRenderers = [defaultObjectRenderer];

@@ -369,4 +369,52 @@ export class Schema<T extends JsonSchema = JsonSchema> {
   public isBooleanSchema(): this is Schema<boolean> {
     return typeof this.schema === "boolean";
   }
+
+  /**
+   * Get the leaf path of the schema object.
+   * @example
+   * Path: #/properties/foo
+   * Leaf path: foo
+   */
+  public getLeafPath(): string {
+    return this.path.split("/").pop() || "";
+  }
+
+  public isRequired(value: unknown): boolean {
+    const parent = this.parent;
+    if (!parent?.isObjectSchema()) {
+      return false;
+    }
+
+    const propertyKey = this.getLeafPath();
+    const directRequired =
+      parent.schema.required?.includes(propertyKey) ?? false;
+    if (directRequired) {
+      return true;
+    }
+
+    if (
+      !parent.schema.dependentRequired ||
+      value === null ||
+      value === undefined ||
+      typeof value !== "object"
+    ) {
+      return false;
+    }
+
+    for (const [field, requiredIfFieldPresent] of Object.entries(
+      parent.schema.dependentRequired,
+    )) {
+      if (
+        field === propertyKey &&
+        requiredIfFieldPresent.every(
+          (field) => field in value && !!value[field as keyof typeof value],
+        )
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }

@@ -1,51 +1,54 @@
-import type { SchemaTester } from "../types";
+import type {
+  Format,
+  ObjectSchema,
+  SchemaTester,
+  SchemaTesterFn,
+} from "../types";
 
-/**
- * Builder for a schema tester
- */
-export class TesterBuilder {
-  private testers: SchemaTester[] = [];
-
-  /**
-   * Add a tester to the builder
-   * @param tester The tester to add
-   */
-  public add(tester: SchemaTester): this {
-    this.testers.push(tester);
-    return this;
-  }
-
-  /**
-   * Add a tester that checks if the schema is a boolean schema
-   */
-  public withType(type: string): this {
-    return this.add((schema) => schema.type === type);
-  }
-
-  /**
-   * Add a tester that checks if the schema is a boolean schema
-   * @param format
-   */
-  public withFormat(format: string): this {
-    return this.add((schema) => schema.format === format);
-  }
-
-  /**
-   * Build the schema tester
-   */
-  public build(): SchemaTester {
-    return (schema) => {
-      return this.testers.some((tester) => tester(schema));
-    };
-  }
+function withType(type: string): SchemaTesterFn {
+  return (schema) => schema.type === type;
 }
 
-/**
- * Create a schema tester
- * @param init The tester builder initialization
- */
-export function Tester(init: (builder: TesterBuilder) => void): SchemaTester {
-  const builder = new TesterBuilder();
-  init(builder);
-  return builder.build();
+function withAnyTypeOf(...types: ObjectSchema["type"][]): SchemaTesterFn {
+  return (schema) => types.includes(schema.type);
+}
+
+function withStringFormat(format: Format): SchemaTesterFn {
+  return (schema) => schema.format === format;
+}
+
+function keyword(name: keyof ObjectSchema): SchemaTesterFn {
+  return (schema) =>
+    typeof schema === "object" &&
+    Object.prototype.hasOwnProperty.call(schema, name);
+}
+
+export const test = {
+  keyword,
+  withType,
+  withAnyTypeOf,
+  withStringFormat,
+  object: withType("object"),
+  array: withType("array"),
+  string: withType("string"),
+  number: withType("number"),
+  integer: withType("integer"),
+  boolean: withType("boolean"),
+  null: withType("null"),
+  or:
+    (...testers: SchemaTesterFn[]): SchemaTesterFn =>
+    (schema) =>
+      testers.some((tester) => tester(schema)),
+  and:
+    (...testers: SchemaTesterFn[]): SchemaTesterFn =>
+    (schema) =>
+      testers.every((tester) => tester(schema)),
+};
+
+export function createTester(
+  priority: number,
+  tester: SchemaTesterFn,
+): SchemaTester {
+  Object.assign(tester, { priority });
+  return tester as SchemaTester;
 }

@@ -22,7 +22,6 @@ export interface FormState {
   schema: Schema<ObjectSchema>;
   value: AnySchemaValue;
   flags: Map<string, boolean>;
-  renderers: SchemaRenderer[];
 }
 
 /**
@@ -46,7 +45,7 @@ export type FormOptions = {
   createStore: FormStoreFactory;
   schema: ObjectSchema;
   defaultValue?: AnySchemaValue;
-  additionalReferences?: Record<string, ObjectSchema>;
+  additionalReferences?: ObjectSchema[];
   renderers?: Array<SchemaRenderer>;
 };
 

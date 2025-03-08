@@ -1,14 +1,13 @@
 import type { SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { BaseNumberRenderer } from "./BaseNumberRenderer.tsx";
 
-const defaultNumberRenderer: SchemaRenderer = {
+const numericTester = createTester(0, test.or(test.number, test.integer));
+
+export const defaultNumberRenderer: SchemaRenderer = {
   id: "react-vanilla.number.default",
-  tester: Tester((builder) => {
-    builder.withType("number");
-  }),
-  priority: 0,
+  tester: numericTester,
   renderer: ({ schema, ...props }) => {
     const jsonSchema = schema.toJSON();
     return (
@@ -32,5 +31,3 @@ const defaultNumberRenderer: SchemaRenderer = {
     );
   },
 };
-
-export const numberRenderers = [defaultNumberRenderer];

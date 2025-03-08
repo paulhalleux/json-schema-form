@@ -35,14 +35,19 @@ export function BaseStringRenderer({
   const schemaJson = schema.toJSON();
 
   return (
-    <Field id={id} label={schemaJson.title} error={error} required={required}>
+    <Field
+      id={id}
+      label={schemaJson.title}
+      help={schemaJson.description}
+      error={error}
+      required={required}
+    >
       <Input
         type={type}
         name={id}
         id={id}
         value={value ?? ""}
         onChange={onInputChange}
-        placeholder={schemaJson.description}
         pattern={regex}
         min={min}
         max={max}

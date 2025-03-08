@@ -1,6 +1,10 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import type { ObjectSchema } from "@phalleux/jsf-schema-utils";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import {
+  createTester,
+  type ObjectSchema,
+  type SchemaTesterFn,
+  test,
+} from "@phalleux/jsf-schema-utils";
 
 import type { BaseStringRendererProps } from "./BaseStringRenderer.tsx";
 import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
@@ -12,26 +16,20 @@ import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
  * @param getProps - a function that returns the props to pass to the renderer
  */
 export const createFormatRenderer = ({
-  format,
+  id,
+  tester,
   priority = 1,
   getProps,
 }: {
-  format: string | string[];
+  id: string;
+  tester: SchemaTesterFn;
   priority?: number;
   getProps: (
     schema: ObjectSchema,
   ) => Omit<BaseStringRendererProps, keyof BaseRendererProps>;
 }): SchemaRenderer => ({
-  id: `react-vanilla.string.format.${format}`,
-  tester: Tester((builder) => {
-    builder.withType("string");
-    if (Array.isArray(format)) {
-      format.forEach((f) => builder.withFormat(f));
-    } else {
-      builder.withFormat(format);
-    }
-  }),
-  priority,
+  id: `react-vanilla.string.format.${id}`,
+  tester: createTester(priority, test.and(test.string, tester)),
   renderer: ({ schema, ...props }) => {
     const schemaJson = schema.toJSON();
     return (

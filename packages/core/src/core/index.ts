@@ -11,7 +11,6 @@ import type {
   FormState,
   InitFormOptions,
 } from "../types/core.ts";
-import type { SchemaRenderer } from "../types/renderer.ts";
 
 enableMapSet();
 
@@ -19,7 +18,6 @@ const DEFAULT_STATE: FormState = {
   schema: new Schema({}),
   value: {},
   flags: new Map<string, boolean>(),
-  renderers: [],
 };
 
 const DEFAULT_OPTIONS: FormOptions = {
@@ -39,11 +37,7 @@ const DEFAULT_OPTIONS: FormOptions = {
 export function createForm(options: InitFormOptions = {}): Form {
   const resolvedOptions = merge({}, DEFAULT_OPTIONS, options) as FormOptions;
 
-  const state = merge({}, DEFAULT_STATE, {
-    renderers: sortRenderers(resolvedOptions.renderers ?? []),
-  });
-
-  const store = resolvedOptions.createStore(state);
+  const store = resolvedOptions.createStore(DEFAULT_STATE);
   const storeUpdater = createStoreUpdater(store);
 
   // Create the form core
@@ -55,6 +49,9 @@ export function createForm(options: InitFormOptions = {}): Form {
   const setSchema = (schema: ObjectSchema) => {
     storeUpdater((state) => {
       state.schema = new Schema(schema);
+      for (const ref of resolvedOptions.additionalReferences ?? []) {
+        state.schema.registerDefinition(ref);
+      }
       state.value = null;
     });
   };
@@ -107,11 +104,18 @@ export function createForm(options: InitFormOptions = {}): Form {
 
     // Rendering
     getRenderer: (schema, previousRenderers) => {
-      const { renderers } = store.getState();
-      const renderer = renderers
+      const { renderers = [] } = resolvedOptions;
+      const matchingRenderers = renderers
         .filter((renderer) => !previousRenderers.includes(renderer.id))
-        .find((renderer) => renderer.tester(schema));
-      return renderer ?? null;
+        .filter((renderer) => renderer.tester(schema));
+
+      console.log(matchingRenderers);
+
+      return (
+        matchingRenderers.sort(
+          (a, b) => b.tester.priority - a.tester.priority,
+        )[0] ?? null
+      );
     },
 
     // Flags
@@ -125,7 +129,3 @@ export function createForm(options: InitFormOptions = {}): Form {
     },
   };
 }
-
-const sortRenderers = (renderers: SchemaRenderer[]) => {
-  return renderers.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
-};

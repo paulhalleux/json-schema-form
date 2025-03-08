@@ -1,15 +1,14 @@
 import type { SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { BaseStringRenderer } from "./BaseStringRenderer.tsx";
 import { formats } from "./formats";
 
+const stringTester = createTester(0, test.string);
+
 const defaultStringRenderer: SchemaRenderer = {
   id: "react-vanilla.string.default",
-  tester: Tester((builder) => {
-    builder.withType("string");
-  }),
-  priority: 0,
+  tester: stringTester,
   renderer: ({ schema, ...props }) => {
     const schemaJson = schema.toJSON();
     if (typeof schemaJson === "boolean") {

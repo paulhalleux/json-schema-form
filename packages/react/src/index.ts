@@ -15,6 +15,7 @@ declare module "@phalleux/jsf-core" {
 
 export * from "./adapter";
 export * from "./components";
+export * from "./constants/priorities.ts";
 export * from "./hooks/useField.ts";
 export * from "./hooks/useArrayField.ts";
 export * from "./hooks/useKeyedArray.ts";

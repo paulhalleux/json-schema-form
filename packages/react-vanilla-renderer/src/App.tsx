@@ -1,7 +1,10 @@
 import React from "react";
 
 import type { PlaygroundHTMLElement } from "@phalleux/jsf-playground-core";
-import { createPlaygroundElement } from "@phalleux/jsf-playground-core";
+import {
+  CompleteSchemas,
+  createPlaygroundElement,
+} from "@phalleux/jsf-playground-core";
 import { Form, useForm } from "@phalleux/jsf-react";
 
 import { reactVanillaRenderers } from "./renderers";
@@ -22,6 +25,7 @@ declare module "react" {
 
 export function Playground() {
   const form = useForm({
+    additionalReferences: CompleteSchemas,
     renderers: reactVanillaRenderers,
   });
 
@@ -38,7 +42,7 @@ export function Playground() {
       ref={onMount}
       data-name="@phalleux/jsf-react-vanilla-renderer"
     >
-      <div className="px-4 py-3">
+      <div className="p-3 overflow-auto">
         <Form form={form} onSubmit={(event) => event.preventDefault()} />
       </div>
     </playground-element>

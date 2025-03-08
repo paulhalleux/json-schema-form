@@ -1,16 +1,14 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema } from "../adapter";
+import { Priorities } from "../constants/priorities.ts";
 
-const refTester = Tester((builder) => {
-  builder.add((schema) => schema.$ref !== undefined);
-});
+const refTester = createTester(Priorities.REF, test.keyword("$ref"));
 
 export const refRenderer: SchemaRenderer = {
   id: "react.builtin.ref",
   tester: refTester,
-  priority: 10,
   renderer: function RedRenderer({ schema, ...props }: BaseRendererProps) {
     const dereferenced = schema.toDereferenced();
     if (dereferenced.isBooleanSchema()) return null;

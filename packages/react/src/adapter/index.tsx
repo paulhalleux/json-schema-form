@@ -73,11 +73,13 @@ export const RenderSchema = ({
   schema,
   path,
   previousRenderers,
-}: BaseRendererProps) => {
+}: Omit<BaseRendererProps, "options">) => {
   const instance = useFormInstance();
+  const schemaJson = schema.toJSON();
+
   const renderer = useMemo(() => {
-    return instance.getRenderer(schema.toJSON(), previousRenderers);
-  }, [instance, previousRenderers, schema]);
+    return instance.getRenderer(schemaJson, previousRenderers);
+  }, [instance, previousRenderers, schemaJson]);
 
   if (!renderer) return "No renderer found";
 

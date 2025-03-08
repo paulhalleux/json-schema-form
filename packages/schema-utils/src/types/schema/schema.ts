@@ -50,6 +50,7 @@ export interface ObjectSchema {
 
   // Object validation keywords
   required?: string[];
+  dependentRequired?: Record<string, string[]>;
   properties?: Record<string, JsonSchema>;
   patternProperties?: Record<string, JsonSchema>;
   additionalProperties?: JsonSchema;

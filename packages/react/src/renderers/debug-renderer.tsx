@@ -1,16 +1,14 @@
 import type { SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema, useStore } from "../adapter";
+import { Priorities } from "../constants/priorities.ts";
+
+const debugTester = createTester(Priorities.DEBUG, () => true);
 
 export const debugRenderer: SchemaRenderer = {
   id: "react.builtin.debug",
-  tester: Tester((builder) => {
-    builder.add(() => {
-      return true;
-    });
-  }),
-  priority: 100,
+  tester: debugTester,
   renderer: function PlaygroundDebugRenderer(props) {
     const debug = useStore((_, form) => form.getFlag("debug"));
 

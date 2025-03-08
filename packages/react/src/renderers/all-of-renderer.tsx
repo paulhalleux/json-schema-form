@@ -1,16 +1,14 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema, useStore } from "../adapter";
+import { Priorities } from "../constants/priorities.ts";
 
-const allOfTester = Tester((builder) => {
-  builder.add((schema) => schema.allOf !== undefined);
-});
+const allOfTester = createTester(Priorities.ALL_OF, test.keyword("allOf"));
 
 export const allOfRenderer: SchemaRenderer = {
   id: "react.builtin.allOf",
   tester: allOfTester,
-  priority: 10,
   renderer: function AllOfRenderer({
     schema,
     path,

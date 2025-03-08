@@ -21,12 +21,20 @@ export function useField<T extends AnySchemaValue>({
 }: UseFieldArgs) {
   const { setValue } = useSetValue({ schema, path });
   const value = useStore((_, form) => form.getFieldValue(path) as T | null);
+  const required = useStore((_, form) => {
+    const parentKey = path.split("/").slice(0, -1).join("/");
+    const parent = form.getFieldValue(parentKey);
+    if (!parent) {
+      return false;
+    }
+    return schema.isRequired(parent);
+  });
 
   return {
     value,
     setValue,
     id: schema.getPath(),
     error: undefined,
-    required: false,
+    required,
   };
 }

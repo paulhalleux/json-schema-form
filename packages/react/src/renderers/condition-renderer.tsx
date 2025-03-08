@@ -1,16 +1,14 @@
 import type { BaseRendererProps, SchemaRenderer } from "@phalleux/jsf-core";
-import { Tester } from "@phalleux/jsf-schema-utils";
+import { createTester, test } from "@phalleux/jsf-schema-utils";
 
 import { RenderSchema, useStore } from "../adapter";
+import { Priorities } from "../constants/priorities.ts";
 
-const conditionTester = Tester((builder) => {
-  builder.add((schema) => schema.if !== undefined);
-});
+const conditionTester = createTester(Priorities.CONDITION, test.keyword("if"));
 
 export const conditionRenderer: SchemaRenderer = {
   id: "react.builtin.condition",
   tester: conditionTester,
-  priority: 50,
   renderer: function ConditionRenderer({
     schema,
     path,

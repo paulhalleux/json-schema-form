@@ -38,14 +38,19 @@ export function BaseNumberRenderer({
   const jsonSchema = schema.toJSON();
 
   return (
-    <Field id={id} label={jsonSchema.title} error={error} required={required}>
+    <Field
+      id={id}
+      label={jsonSchema.title}
+      help={jsonSchema.description}
+      error={error}
+      required={required}
+    >
       <Input
         type="number"
         name={id}
         id={id}
         value={value ?? ""}
         onChange={onInputChange}
-        placeholder={jsonSchema.description}
         min={min}
         max={max}
         minLength={typeof min === "number" ? min : undefined}

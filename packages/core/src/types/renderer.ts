@@ -53,11 +53,6 @@ export type SchemaRenderer = {
    */
   id: string;
   /**
-   * The priority of the renderer
-   * Higher priority renderers will be used first
-   */
-  priority?: number;
-  /**
    * The tester to determine if the renderer should be used
    */
   tester: SchemaTester;
